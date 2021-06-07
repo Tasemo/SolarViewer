@@ -1,0 +1,21 @@
+{
+  "name": "solar-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "typescript": "^4.3.2"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tasemo/SolarViewer.git"
+  },
+  "author": "Tim Oelkers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tasemo/SolarViewer/issues"
+  },
+  "homepage": "https://github.com/Tasemo/SolarViewer#readme"
+}
