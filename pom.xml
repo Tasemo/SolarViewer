@@ -20,7 +20,16 @@
         <node.version>v14.17.0</node.version>
         <npm.version>7.9.0</npm.version>
         <npm-plugin.version>1.9.1</npm-plugin.version>
+        <undertow.version>2.2.8.Final</undertow.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>${undertow.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
