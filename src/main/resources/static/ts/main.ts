@@ -1,29 +1,23 @@
-window.onload = async () => {
-    const canvas = document.querySelector<HTMLCanvasElement>("#glCanvas")!
-    const gl = canvas.getContext("webgl")!
-    gl.clearColor(1, 0, 0, 1)
-    const vertexShader = await loadShader(gl, gl.VERTEX_SHADER, "shader/entityShader.vert")
-    const fragmentShader = await loadShader(gl, gl.FRAGMENT_SHADER, "shader/entityShader.frag")
-    const shaderProgram = gl.createProgram()!;
-    gl.attachShader(shaderProgram, vertexShader)
-    gl.attachShader(shaderProgram, fragmentShader)
-    gl.linkProgram(shaderProgram)
-    gl.useProgram(shaderProgram)
+import * as THREE from "three";
 
-    requestAnimationFrame(() => {
-        render(gl)
-    });
-}
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-async function loadShader(gl: WebGLRenderingContext, type: number, url: string): Promise<WebGLShader> {
-    const shader = gl.createShader(type)!
-    const source = await (await fetch(url)).text();
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-    return shader;
-}
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-function render(gl: WebGLRenderingContext) {
-    gl.clear(gl.COLOR_BUFFER_BIT)
-    requestAnimationFrame(() => render(gl))
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+camera.position.z = 5;
+render();
+
+function render() {
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+    requestAnimationFrame(render);
 }
