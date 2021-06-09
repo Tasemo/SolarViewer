@@ -14,11 +14,12 @@ public final class SolarViewerServer {
     private SolarViewerServer() {}
 
     public static void main(String[] args) {
-        ResourceManager resourceManager = new ClassPathResourceManager(ClassLoader.getSystemClassLoader(), "static");
+        ResourceManager resourceManager = new ClassPathResourceManager(ClassLoader.getSystemClassLoader());
         ResourceHandler resourceHandler = Handlers.resource(resourceManager);
         resourceHandler.setAllowed(Predicates.suffixes("", ".html", ".js", ".css", ".frag", ".vert"));
         RoutingHandler routingHandler = new RoutingHandler();
         routingHandler.add(Methods.GET, "/*", resourceHandler);
+        routingHandler.add(Methods.GET, "/mola", new MolaDataEndpoint());
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "localhost")
                 .setHandler(routingHandler)

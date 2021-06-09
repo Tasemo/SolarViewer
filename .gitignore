@@ -4,3 +4,5 @@ target
 js
 installs
 node_modules
+data
+resources

@@ -46,7 +46,7 @@
                     <nodeVersion>${node.version}</nodeVersion>
                     <npmVersion>${npm.version}</npmVersion>
                     <installDirectory>installs</installDirectory>
-                    <workingDirectory>src/main/resources/static</workingDirectory>
+                    <workingDirectory>src/main/web</workingDirectory>
                 </configuration>
                 <executions>
                     <execution>
