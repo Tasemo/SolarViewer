@@ -2,18 +2,17 @@ import * as THREE from "three";
 
 export default class ModelLoader {
 
-    async load(url: string, sizePerPoint: number): Promise<THREE.BufferGeometry> {
+    async load(url: string, sizePerPoint: number, globalScale: number): Promise<THREE.BufferGeometry> {
         const rawData: number[] = await (await fetch(url)).json()
-        console.log(rawData.length);
         const vertices = [rawData.length * 3]
         const vertexCountEdge = Math.sqrt(rawData.length);
         let vertexCounter = 0;
         for (let i = 0; i < rawData.length; i++) {
             const x = i % vertexCountEdge;
             const z = i / vertexCountEdge;
-            vertices[vertexCounter++] = x * sizePerPoint;
-            vertices[vertexCounter++] = rawData[i]!;
-            vertices[vertexCounter++] = z * sizePerPoint;
+            vertices[vertexCounter++] = x * sizePerPoint / globalScale;
+            vertices[vertexCounter++] = rawData[i]! / globalScale;
+            vertices[vertexCounter++] = z * sizePerPoint / globalScale;
         }
         const indices = [6 * (vertexCountEdge - 1) * (vertexCountEdge - 1)];
         let indexCounter = 0;
@@ -32,7 +31,7 @@ export default class ModelLoader {
             }
         }
         const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.Int16BufferAttribute(vertices, 3));
+        geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
         geometry.setIndex(indices);
         return geometry;
     }
