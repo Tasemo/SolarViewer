@@ -1,11 +1,8 @@
 import * as THREE from "three";
 import ModelLoader from './modelLoader';
 import CameraController from './cameraController';
-
-const MOLA_METER_PER_PIXEL = 463.0835744;
-const METER_PER_GL_UNIT = 100;
-const MOVEMENT_SPEED = 100;
-const ROTATION_SPEED = 0.002;
+import { Constants } from "./constants";
+import WorldController from './worldController';
 
 let renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera;
 let cameraController: CameraController;
@@ -18,17 +15,17 @@ window.addEventListener("load", async () => {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
-    cameraController = new CameraController(camera, MOVEMENT_SPEED, ROTATION_SPEED);
+    cameraController = new CameraController(camera);
 
     scene.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial( { color: 0xff0000ff })));
 
-    const modelLoader = new ModelLoader();
-    const geometry = await modelLoader.load("mola?x=0&y=0&width=100&height=100", MOLA_METER_PER_PIXEL, METER_PER_GL_UNIT);
     const material = new THREE.ShaderMaterial({
         vertexShader: await (await fetch("shader/entityShader.vert")).text(),
         fragmentShader: await (await fetch("shader/entityShader.frag")).text()
     });
-    scene.add(new THREE.Mesh(geometry, material));
+    const onGeometryLoad = (geometry: THREE.BufferGeometry) => scene.add(new THREE.Mesh(geometry, material));
+    const modelLoader = new ModelLoader("mola", Constants.MOLA_METER_PER_PIXEL);
+    new WorldController(camera, modelLoader, Constants.MOLA_PIXELS_PER_GL_UNIT, onGeometryLoad);
 
     render();
 });

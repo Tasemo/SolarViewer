@@ -1,17 +1,14 @@
 import * as THREE from "three";
+import { Constants } from "./constants";
 
 export default class CameraController {
 
-    private keyboardSpeed: number;
-    private rotationSpeed: number;
     private camera: THREE.Camera;
     private movement = new THREE.Vector3();
     private dragging = false;
 
-    constructor(camera: THREE.Camera, keyboardSpeed: number, rotationSpeed: number) {
+    constructor(camera: THREE.Camera) {
         this.camera = camera;
-        this.keyboardSpeed = keyboardSpeed;
-        this.rotationSpeed = rotationSpeed;
         window.addEventListener("keydown", this.onKeyDown.bind(this));
         window.addEventListener("keyup", this.onKeyUp.bind(this));
         window.addEventListener("mousedown", (() => this.dragging = true).bind(this));
@@ -25,28 +22,29 @@ export default class CameraController {
         this.camera.translateX(scaled.x);
         this.camera.translateY(scaled.y);
         this.camera.translateZ(scaled.z);
+        this.camera.dispatchEvent({ type: "viewChange" });
     }
 
     onKeyDown(event: KeyboardEvent) {
         if (!event.repeat) {
             switch (event.code) {
                 case "KeyW":
-                    this.movement.z = -this.keyboardSpeed;
+                    this.movement.z = -Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyA":
-                    this.movement.x = -this.keyboardSpeed;
+                    this.movement.x = -Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyS":
-                    this.movement.z = this.keyboardSpeed;
+                    this.movement.z = Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyD":
-                    this.movement.x = this.keyboardSpeed;
+                    this.movement.x = Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyQ":
-                    this.movement.y = this.keyboardSpeed;
+                    this.movement.y = Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyE":
-                    this.movement.y = -this.keyboardSpeed;
+                    this.movement.y = -Constants.MOVEMENT_SPEED;
                     break;
             }
         }
@@ -71,8 +69,9 @@ export default class CameraController {
 
     onMouseMove(event: MouseEvent) {
         if (this.dragging) {
-            this.camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * this.rotationSpeed);
-            this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * this.rotationSpeed);
+            this.camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * Constants.ROTATION_SPEED);
+            this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * Constants.ROTATION_SPEED);
+            this.camera.dispatchEvent({ type: "viewChange" });
         }
     }
 }
