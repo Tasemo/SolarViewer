@@ -13,13 +13,12 @@ window.addEventListener("load", async () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    camera.rotateY(Math.PI);
     cameraController = new CameraController(camera);
 
-    scene.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial( { color: 0xff0000ff })));
-
     const material = new THREE.ShaderMaterial({
+        uniforms: { meterPerGLUnit: { value: Constants.METER_PER_GL_UNIT } },
         vertexShader: await (await fetch("shader/entityShader.vert")).text(),
         fragmentShader: await (await fetch("shader/entityShader.frag")).text()
     });

@@ -14,8 +14,11 @@ export default class WorldController {
         this.modelLoader = modelLoader;
         this.pixelsPerGLUnit = pixelsPerGLUnit;
         this.onGeometryLoad = onGeometryLoad;
-        this.load(0, 0);
-        this.load(0, Constants.CHUNK_SIZE_PIXELS);
+        for (let x = 0; x < Constants.MOLA_CHUNKS_WIDTH; x++) {
+            for (let z = 0; z < Constants.MOLA_PIXELS_HEIGHT; z++) {
+                this.load(x, z);
+            }
+        }
         camera.addEventListener("viewChange", this.onViewChange.bind(this));
     }
 
@@ -23,11 +26,13 @@ export default class WorldController {
 
     }
 
-    async load(x: number, y:number) {
-        if (!this.chunks[x]![y]) {
+    async load(x: number, y: number) {
+        if (!this.chunks[x] || !this.chunks[x]![y]) {
+            if (!this.chunks[x]) {
+                this.chunks[x] = [];
+            }
             this.chunks[x]![y] = true;
-            console.log("Loading: " + x + ", " + y);
-            const geometry = await this.modelLoader.load(x, y);
+            const geometry = await this.modelLoader.load(x * Constants.CHUNK_SIZE_PIXELS, y * Constants.CHUNK_SIZE_PIXELS);
             this.onGeometryLoad(geometry);
         }
     }
