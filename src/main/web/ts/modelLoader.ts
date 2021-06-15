@@ -33,7 +33,7 @@ export default class ModelLoader {
         const dataHeight = height / Constants.GLOBAL_STRIDE;
         for (let i = 0; i < elevationData.length; i++) {
             const x = ((i % dataWidth) * Constants.GLOBAL_STRIDE + xPixel) * this.meterPerPixel;
-            const z = (Math.floor(i / dataHeight) * Constants.GLOBAL_STRIDE + zPixel) * this.meterPerPixel;
+            const z = (Math.floor(i / dataWidth) * Constants.GLOBAL_STRIDE + zPixel) * this.meterPerPixel;
             const vertex = new THREE.Vector3(x, elevationData[i], z);
             const projected = this.projection.project(vertex, this.radius).divideScalar(Constants.METER_PER_GL_UNIT);
             vertices.push(projected.x);

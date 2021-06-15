@@ -51,6 +51,9 @@ export default class WorldController {
                 loadZ -= Constants.GLOBAL_STRIDE;
                 loadHeight += Constants.GLOBAL_STRIDE;
             }
+            if (x === Constants.MOLA_CHUNKS_WIDTH - 1) {
+                loadWidth += Constants.GLOBAL_STRIDE;
+            }
             const geometry = await this.modelLoader.load(loadX, loadZ, loadWidth, loadHeight);
             this.onGeometryLoad(geometry);
         }

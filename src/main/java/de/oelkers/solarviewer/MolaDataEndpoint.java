@@ -10,11 +10,15 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.Rectangle;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferShort;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Map;
+
+import static de.oelkers.solarviewer.ArrayUtils.*;
 
 public class MolaDataEndpoint implements HttpHandler {
 
@@ -38,10 +42,32 @@ public class MolaDataEndpoint implements HttpHandler {
             param.setSourceSubsampling(stride, stride, 0, 0);
             param.setSourceRegion(new Rectangle(x, z, width, height));
             reader.setInput(input, true, true);
-            DataBuffer data = reader.read(0, param).getData().getDataBuffer();
+            Raster raster = reader.read(0, param).getData();
+            short[][] data = expand(getData(raster), raster.getWidth(), raster.getHeight());
+            int xOverflow = width + x - reader.getWidth(0);
+            if (xOverflow > 0) {
+                param.setSourceRegion(new Rectangle(0, z, xOverflow, height));
+                short[] additional = getData(reader.read(0, param));
+                data = addColumn(data, additional);
+            }
+            int zOverflow = height + z - reader.getHeight(0);
+            if (zOverflow > 0) {
+                param.setSourceRegion(new Rectangle(x, 0, width, zOverflow));
+                short[] additional = getData(reader.read(0, param));
+                data = addRow(data, additional);
+            }
             reader.dispose();
-            assert data.getDataType() == DataBuffer.TYPE_SHORT;
-            return ((DataBufferShort) data).getData();
+            return flatten(data);
         }
+    }
+
+    private static short[] getData(RenderedImage image) {
+        return getData(image.getData());
+    }
+
+    private static short[] getData(Raster raster) {
+        DataBuffer buffer = raster.getDataBuffer();
+        assert buffer.getDataType() == DataBuffer.TYPE_SHORT;
+        return ((DataBufferShort) buffer).getData();
     }
 }
