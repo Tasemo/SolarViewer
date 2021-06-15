@@ -23,7 +23,7 @@ export default class WorldController {
     }
 
     async onViewChange() {
-
+        
     }
 
     /**

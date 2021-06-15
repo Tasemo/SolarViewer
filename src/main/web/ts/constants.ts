@@ -6,6 +6,7 @@ export namespace Constants {
     export const MOLA_PIXELS_PER_GL_UNIT = 1 / MOLA_METER_PER_PIXEL / METER_PER_GL_UNIT;
     export const MOLA_PIXELS_WIDTH = 46080;
     export const MOLA_PIXELS_HEIGHT = 23040;
+    export const MOLA_RADIUS_METERS = 3396190;
     export const MOLA_CHUNKS_WIDTH = MOLA_PIXELS_WIDTH / CHUNK_SIZE_PIXELS;
     export const MOLA_CHUNKS_HEIGHT = MOLA_PIXELS_HEIGHT / CHUNK_SIZE_PIXELS;
     export const MOVEMENT_SPEED = 1000;
