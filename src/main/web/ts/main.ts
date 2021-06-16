@@ -4,6 +4,8 @@ import CameraController from './cameraController';
 import { Constants } from "./constants";
 import WorldController from './worldController';
 import { Projections } from "./projections";
+import InfoArea from './ui/infoArea';
+import ConfigArea from './ui/configArea';
 
 let renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera;
 let cameraController: CameraController;
@@ -26,6 +28,8 @@ window.addEventListener("load", async () => {
     const onGeometryLoad = (geometry: THREE.BufferGeometry) => scene.add(new THREE.Mesh(geometry, material));
     const modelLoader = new ModelLoader("mola", Constants.MOLA_METER_PER_PIXEL, Projections.SPHERICAL, Constants.MOLA_RADIUS_METERS);
     new WorldController(camera, modelLoader, Constants.MOLA_PIXELS_PER_GL_UNIT, onGeometryLoad);
+    new InfoArea();
+    new ConfigArea();
 
     render();
 });

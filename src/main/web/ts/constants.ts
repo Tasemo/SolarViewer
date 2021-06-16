@@ -9,6 +9,6 @@ export namespace Constants {
     export const MOLA_RADIUS_METERS = 3396190;
     export const MOLA_CHUNKS_WIDTH = MOLA_PIXELS_WIDTH / CHUNK_SIZE_PIXELS;
     export const MOLA_CHUNKS_HEIGHT = MOLA_PIXELS_HEIGHT / CHUNK_SIZE_PIXELS;
-    export const MOVEMENT_SPEED = 1000;
+    export const MOVEMENT_SPEED = 100;
     export const ROTATION_SPEED = 0.002;
 }
