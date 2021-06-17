@@ -1,8 +1,8 @@
 in float terrainHeightMeters;
 
-const float MIN_HEIGHT = -8000.0;
-const float MAX_HEIGHT = 8000.0;
-const float HUE_CUTOFF = 0.7;
+uniform float minHeight;
+uniform float maxHeight;
+uniform float hueCutoff;
 
 float map(float value, float min1, float max1, float min2, float max2) {
     float factor = min2 + (value - min1) * (max2 - min2) / (max1 - min1);
@@ -17,6 +17,6 @@ vec3 hsv2rgb(vec3 c) {
 }
 
 void main(void) {
-    float factor = map(terrainHeightMeters, MIN_HEIGHT, MAX_HEIGHT, 0.0, HUE_CUTOFF);
-    gl_FragColor = vec4(hsv2rgb(vec3(HUE_CUTOFF - factor, 1.0, 1.0)), 1.0);
+    float factor = map(terrainHeightMeters, minHeight, maxHeight, 0.0, hueCutoff);
+    gl_FragColor = vec4(hsv2rgb(vec3(hueCutoff - factor, 1.0, 1.0)), 1.0);
 }

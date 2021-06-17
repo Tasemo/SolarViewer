@@ -10,13 +10,21 @@
 
 <body>
     <div id="infoArea" class="sliderContainer">
-        <i class="fas fa-fw fa-info"></i>
+        <div class="sliderLogo">
+            <i class="fas fa-fw fa-info"></i>
+        </div>
         <div class="sliderArea">
-
+            <div class="sliderEntry">
+                <div id="minHeight">-8000m</div>
+                <div id="heightScale"></div>
+                <div id="maxHeight">8000m</div>
+            </div>
         </div>
     </div>
     <div id="configArea" class="sliderContainer">
-        <i class="fas fa-fw fa-cogs"></i>
+        <div class="sliderLogo">
+            <i class="fas fa-fw fa-cogs"></i>
+        </div>
         <div class="sliderArea">
             <div class="sliderEntry">
                 <label for="planet">Planet:</label>
@@ -27,6 +35,14 @@
             <div class="sliderEntry">
                 <label for="projection">Projection:</label>
                 <input id="projection" type="checkbox" checked>
+            </div>
+            <div class="sliderEntry">
+                <label for="minHeightInput">Min Height:</label>
+                <input id="minHeightInput" type="number" value="-8000" pattern="[1-9]\d*">
+            </div>
+            <div class="sliderEntry">
+                <label for="maxHeightInput">Max Height:</label>
+                <input id="maxHeightInput" type="number" value="8000" pattern="[1-9]\d*"/>
             </div>
         </div>
     </div>

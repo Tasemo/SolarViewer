@@ -12,4 +12,5 @@ export namespace Constants {
     export const MOVEMENT_SPEED = 100;
     export const ROTATION_SPEED = 0.002;
     export const SLIDER_SPEED = 2000;
+    export const HUE_CUTOFF = 0.7;
 }

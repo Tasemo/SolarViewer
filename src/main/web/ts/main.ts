@@ -17,19 +17,23 @@ window.addEventListener("load", async () => {
     document.body.appendChild(renderer.domElement);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-    camera.rotateY(Math.PI);
     cameraController = new CameraController(camera);
 
     const material = new THREE.ShaderMaterial({
-        side: THREE.DoubleSide,
-        vertexShader: await (await fetch("shader/entityShader.vert")).text(),
-        fragmentShader: await (await fetch("shader/entityShader.frag")).text()
+        uniforms: {
+            "hueCutoff": { value: Constants.HUE_CUTOFF },
+            "minHeight": { value: -8000 },
+            "maxHeight": { value: 8000 }
+        },
+        vertexShader: await (await fetch("shader/topographyShader.vert")).text(),
+        fragmentShader: await (await fetch("shader/topographyShader.frag")).text(),
+        side: THREE.DoubleSide
     });
     const modelLoader = new ModelLoader("mola", Constants.MOLA_METER_PER_PIXEL, Projections.SPHERICAL, Constants.MOLA_RADIUS_METERS);
     const worldController = new WorldController(camera, scene, material, modelLoader, Constants.MOLA_PIXELS_PER_GL_UNIT);
-    
+
     new InfoArea();
-    new ConfigArea(worldController);
+    new ConfigArea(worldController, material.uniforms["minHeight"]!, material.uniforms["maxHeight"]!);
     render();
 });
 
