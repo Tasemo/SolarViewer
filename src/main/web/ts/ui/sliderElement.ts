@@ -1,16 +1,19 @@
+import { Constants } from "../constants";
+
 export default class SliderElement {
 
     private element: HTMLElement;
     private scrollOffset: number;
-    private time: number;
-    private steps: number;
+    private interval: number;
     private active = false;
 
-    constructor(element: HTMLElement, scrollOffset: number, time: number, steps: number) {
+    constructor(element: HTMLElement) {
+        const sliderArea = element.querySelector(".sliderArea")!;
+        sliderArea.addEventListener("click", event => event.stopPropagation());
+        element.style.left = element.getBoundingClientRect().left + sliderArea.clientWidth + "px"
         this.element = element;
-        this.scrollOffset = scrollOffset;
-        this.time = time;
-        this.steps = steps;
+        this.scrollOffset = -sliderArea.clientWidth;
+        this.interval = Constants.SLIDER_SPEED / 1 / 60;
         element.addEventListener("click", this.onClick.bind(this));
     }
 
@@ -22,18 +25,19 @@ export default class SliderElement {
                 const currentX = this.element.getBoundingClientRect().left
                 let done;
                 if (this.scrollOffset > 0) {
-                    done = currentX > target;
+                    done = currentX >= target;
                 } else {
-                    done = currentX < target;
+                    done = currentX <= target;
                 }
                 if (done) {
                     clearInterval(interval);
+                    this.element.style.left = target + "px";
                     this.active = false;
                     this.scrollOffset = -this.scrollOffset;
                 } else {
-                    this.element.style.left = (currentX + this.scrollOffset / this.steps) + "px";
+                    this.element.style.left = (currentX + this.scrollOffset / this.interval) + "px";
                 }
-            }, this.time / this.steps)
+            }, this.interval)
         }
     }
 }

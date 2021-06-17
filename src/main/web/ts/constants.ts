@@ -11,4 +11,5 @@ export namespace Constants {
     export const MOLA_CHUNKS_HEIGHT = MOLA_PIXELS_HEIGHT / CHUNK_SIZE_PIXELS;
     export const MOVEMENT_SPEED = 100;
     export const ROTATION_SPEED = 0.002;
+    export const SLIDER_SPEED = 2000;
 }

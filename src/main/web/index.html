@@ -4,15 +4,31 @@
 <head>
     <meta charset="utf-8">
     <title>SolarViewer</title>
+    <script src="https://kit.fontawesome.com/fb4e622148.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="./css/main.css">
 </head>
 
 <body>
-    <div id="infoArea" class="sliderArea">
+    <div id="infoArea" class="sliderContainer">
+        <i class="fas fa-fw fa-info"></i>
+        <div class="sliderArea">
 
+        </div>
     </div>
-    <div id="configArea" class="sliderArea">
-
+    <div id="configArea" class="sliderContainer">
+        <i class="fas fa-fw fa-cogs"></i>
+        <div class="sliderArea">
+            <div class="sliderEntry">
+                <label for="planet">Planet:</label>
+                <select id="planet">
+                    <option value="mars">Mars</option>
+                </select>
+            </div>
+            <div class="sliderEntry">
+                <label for="projection">Projection:</label>
+                <input id="projection" type="checkbox" checked>
+            </div>
+        </div>
     </div>
     <script type="module" src="./js/bundle.js"></script>
 </body>
