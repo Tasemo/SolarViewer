@@ -15,15 +15,15 @@ class SphericalProjection implements Projection {
     getLatLongAlt(vertex: THREE.Vector3, radius: number) {
         const altitude = vertex.length() - radius;
         radius = radius + altitude;
-        const latitude = Math.asin(vertex.z / radius);
-        const longitude = Math.atan2(vertex.y, vertex.x);
+        const latitude = Math.asin(-vertex.y / radius);
+        const longitude = Math.atan2(vertex.x, vertex.z);
         return new THREE.Vector3(latitude, longitude, altitude);
     }
 
     private toSphereVertex(latitude: number, longitude: number, radius: number): THREE.Vector3 {
-        const x = radius * Math.cos(latitude) * Math.cos(longitude);
-        const y = radius * Math.cos(latitude) * Math.sin(longitude);
-        const z = radius * Math.sin(latitude);
+        const x = radius * Math.cos(latitude) * Math.sin(longitude);
+        const y = -radius * Math.sin(latitude);
+        const z = radius * Math.cos(latitude) * Math.cos(longitude);
         return new THREE.Vector3(x, y, z);
     }
 
@@ -45,7 +45,6 @@ class FlatProjection implements Projection {
         return vertex;
     }
 
-    // correct!
     getLatLongAlt(vertex: THREE.Vector3, radius: number) {
         const latitude = vertex.z / radius - Math.PI / 2;
         const longitude = vertex.x / radius - Math.PI;
