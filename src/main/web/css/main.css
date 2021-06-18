@@ -3,16 +3,18 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    user-select: none;
 }
 
 .sliderContainer {
     background-color: #d3d3d3;
-    width: 25%;
+    width: 22%;
     height: 50%;
     display: flex;
     flex-direction: row;
     align-items: center;
     position: absolute;
+    border-radius: 15px 0px 0px 15px;
 }
 
 .sliderLogo {
@@ -31,6 +33,8 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 #infoArea {
