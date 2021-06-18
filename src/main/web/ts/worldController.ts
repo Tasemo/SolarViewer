@@ -11,8 +11,8 @@ class ChunkEntry {
 export default class WorldController {
 
     private chunks: Array<Array<ChunkEntry|null>> = [[]];
-    private camera: THREE.Camera;
-    private scene: THREE.Scene;
+    camera: THREE.Camera;
+    scene: THREE.Scene;
     private material: THREE.Material;
     modelLoader: ModelLoader;
     private pixelsPerGLUnit: number;
@@ -43,7 +43,7 @@ export default class WorldController {
     }
 
     async onViewChange() {
-        
+
     }
 
     /**

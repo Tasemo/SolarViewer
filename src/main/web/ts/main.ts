@@ -32,7 +32,7 @@ window.addEventListener("load", async () => {
     const modelLoader = new ModelLoader("mola", Constants.MOLA_METER_PER_PIXEL, Projections.SPHERICAL, Constants.MOLA_RADIUS_METERS);
     const worldController = new WorldController(camera, scene, material, modelLoader, Constants.MOLA_PIXELS_PER_GL_UNIT);
 
-    new InfoArea();
+    new InfoArea(worldController);
     new ConfigArea(worldController, material.uniforms["minHeight"]!, material.uniforms["maxHeight"]!);
     render();
 });

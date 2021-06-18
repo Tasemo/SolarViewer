@@ -7,7 +7,7 @@ export default class ModelLoader {
     private baseUrl: string;
     private meterPerPixel: number;
     projection: Projection;
-    private radius: number;
+    radius: number;
 
     constructor(baseUrl: string, meterPerPixel: number, projection: Projection, radius: number) {
         this.baseUrl = baseUrl;
