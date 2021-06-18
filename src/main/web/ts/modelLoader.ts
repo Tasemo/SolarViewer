@@ -57,7 +57,6 @@ export default class ModelLoader {
         }
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setAttribute("height", new THREE.Float32BufferAttribute(elevationData, 1));
         geometry.setIndex(indices);
         return geometry;
     }

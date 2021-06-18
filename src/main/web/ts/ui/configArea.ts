@@ -5,12 +5,13 @@ import * as THREE from 'three';
 
 export default class ConfigArea extends SliderElement {
 
-    constructor(worldController: WorldController, minHeightUniform: THREE.IUniform, maxHeightUniform: THREE.IUniform) {
+    constructor(worldController: WorldController, uniforms: { [uniform: string]: THREE.IUniform }) {
         super(document.querySelector("#configArea")!)
         const projection: HTMLInputElement = document.querySelector("#projection")!;
         projection.addEventListener("change", () => {
-            const value = projection.checked ? Projections.SPHERICAL : Projections.FLAT
+            const value = projection.checked ? Projections.SPHERICAL : Projections.FLAT;
             worldController.modelLoader.projection = value;
+            uniforms["projected"]!.value = projection.checked;
             worldController.reload();
         })
         const minHeightInput: HTMLInputElement = document.querySelector("#minHeightInput")!;
@@ -25,7 +26,7 @@ export default class ConfigArea extends SliderElement {
             }
             if (minHeightInput.checkValidity()) {
                 minHeight.textContent = minHeightInput.value + "m";
-                minHeightUniform.value = parseInt(minHeightInput.value);
+                uniforms["minHeight"]!.value = parseInt(minHeightInput.value);
             } else {
                 minHeightInput.reportValidity();
             }
@@ -38,7 +39,7 @@ export default class ConfigArea extends SliderElement {
             }
             if (maxHeightInput.checkValidity()) {
                 maxHeight.textContent = maxHeightInput.value + "m";
-                maxHeightUniform.value = parseInt(maxHeightInput.value);
+                uniforms["maxHeight"]!.value = parseInt(maxHeightInput.value);
             } else {
                 maxHeightInput.reportValidity();
             }

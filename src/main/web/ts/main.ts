@@ -22,8 +22,11 @@ window.addEventListener("load", async () => {
     const material = new THREE.ShaderMaterial({
         uniforms: {
             "hueCutoff": { value: Constants.HUE_CUTOFF },
+            "radius": { value: Constants.MOLA_RADIUS_METERS },
+            "meterPerGLUnit": { value: Constants.METER_PER_GL_UNIT },
             "minHeight": { value: -8000 },
-            "maxHeight": { value: 8000 }
+            "maxHeight": { value: 8000 },
+            "projected": { value: true }
         },
         vertexShader: await (await fetch("shader/topographyShader.vert")).text(),
         fragmentShader: await (await fetch("shader/topographyShader.frag")).text(),
@@ -33,7 +36,7 @@ window.addEventListener("load", async () => {
     const worldController = new WorldController(camera, scene, material, modelLoader, Constants.MOLA_PIXELS_PER_GL_UNIT);
 
     new InfoArea(worldController);
-    new ConfigArea(worldController, material.uniforms["minHeight"]!, material.uniforms["maxHeight"]!);
+    new ConfigArea(worldController, material.uniforms);
     render();
 });
 
