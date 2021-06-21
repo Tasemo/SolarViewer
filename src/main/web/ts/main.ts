@@ -17,6 +17,8 @@ window.addEventListener("load", async () => {
     document.body.appendChild(renderer.domElement);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    camera.translateZ(Constants.MOLA_RADIUS_METERS * 1.5 / Constants.METER_PER_GL_UNIT)
+    camera.updateMatrixWorld();
     cameraController = new CameraController(camera);
 
     const material = new THREE.ShaderMaterial({
@@ -24,8 +26,8 @@ window.addEventListener("load", async () => {
             "hueCutoff": { value: Constants.HUE_CUTOFF },
             "radius": { value: Constants.MOLA_RADIUS_METERS },
             "meterPerGLUnit": { value: Constants.METER_PER_GL_UNIT },
-            "minHeight": { value: -8000 },
-            "maxHeight": { value: 8000 },
+            "minHeight": { value: -4000 },
+            "maxHeight": { value: 4000 },
             "projected": { value: true }
         },
         vertexShader: await (await fetch("shader/topographyShader.vert")).text(),

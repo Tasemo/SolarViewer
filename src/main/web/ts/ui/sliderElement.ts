@@ -17,7 +17,7 @@ export default class SliderElement {
         element.addEventListener("click", this.onClick.bind(this));
     }
 
-    onClick() {
+    private onClick() {
         if (!this.active) {
             this.active = true;
             const target = this.element.getBoundingClientRect().left + this.scrollOffset;

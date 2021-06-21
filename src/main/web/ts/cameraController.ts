@@ -17,12 +17,14 @@ export default class CameraController {
     }
 
     update(frameTimeSeconds: number) {
-        const scaled = this.movement.clone();
-        scaled.multiplyScalar(frameTimeSeconds);
-        this.camera.translateX(scaled.x);
-        this.camera.translateY(scaled.y);
-        this.camera.translateZ(scaled.z);
-        this.camera.dispatchEvent({ type: "viewChange" });
+        if (this.movement.lengthSq() !== 0) {
+            const scaled = this.movement.clone();
+            scaled.multiplyScalar(frameTimeSeconds);
+            this.camera.translateX(scaled.x);
+            this.camera.translateY(scaled.y);
+            this.camera.translateZ(scaled.z);
+            this.camera.dispatchEvent({ type: "viewChange" });
+        }
     }
 
     onKeyDown(event: KeyboardEvent) {

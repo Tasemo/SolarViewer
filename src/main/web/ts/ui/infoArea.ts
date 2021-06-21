@@ -32,7 +32,7 @@ export default class InfoArea extends SliderElement {
         window.addEventListener("click", this.raycast.bind(this));
     }
 
-    raycast(event: MouseEvent) {
+    private raycast(event: MouseEvent) {
         const mouse = {
             x: (event.clientX / window.innerWidth) * 2 - 1,
             y: -(event.clientY / window.innerHeight) * 2 + 1

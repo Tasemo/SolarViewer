@@ -19,7 +19,7 @@ public final class SolarViewerServer {
         routingHandler.add(Methods.GET, "/*", resourceHandler);
         routingHandler.add(Methods.GET, "/mola", new MolaDataEndpoint());
         Undertow server = Undertow.builder()
-                .addHttpListener(8080, "localhost")
+                .addHttpListener(8080, "0.0.0.0")
                 .setHandler(routingHandler)
                 .build();
         server.start();
