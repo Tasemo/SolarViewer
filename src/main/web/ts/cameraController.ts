@@ -27,7 +27,7 @@ export default class CameraController {
         }
     }
 
-    onKeyDown(event: KeyboardEvent) {
+    private onKeyDown(event: KeyboardEvent) {
         if (!event.repeat) {
             switch (event.code) {
                 case "KeyW":
@@ -52,7 +52,7 @@ export default class CameraController {
         }
     }
 
-    onKeyUp(event: KeyboardEvent) {
+    private onKeyUp(event: KeyboardEvent) {
         switch (event.code) {
             case "KeyW":
             case "KeyS":
@@ -69,7 +69,7 @@ export default class CameraController {
         }
     }
 
-    onMouseMove(event: MouseEvent) {
+    private onMouseMove(event: MouseEvent) {
         if (this.dragging) {
             this.camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * Constants.ROTATION_SPEED);
             this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * Constants.ROTATION_SPEED);

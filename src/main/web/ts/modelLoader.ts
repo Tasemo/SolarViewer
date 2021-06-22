@@ -28,36 +28,63 @@ export default class ModelLoader {
     async load(xPixel: number, zPixel: number, width: number, height: number): Promise<THREE.BufferGeometry> {
         const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${Constants.GLOBAL_STRIDE}&width=${width}&height=${height}`;
         const elevationData: number[] = await (await fetch(url)).json()
-        const vertices: number[] = []
+        const vertices = new Float32Array(3 * elevationData.length);
         const dataWidth = width / Constants.GLOBAL_STRIDE;
         const dataHeight = height / Constants.GLOBAL_STRIDE;
         for (let i = 0; i < elevationData.length; i++) {
             const x = ((i % dataWidth) * Constants.GLOBAL_STRIDE + xPixel) * this.meterPerPixel;
             const z = (Math.floor(i / dataWidth) * Constants.GLOBAL_STRIDE + zPixel) * this.meterPerPixel;
-            const vertex = new THREE.Vector3(x, elevationData[i], z);
-            const projected = this.projection.project(vertex, this.radius).divideScalar(Constants.METER_PER_GL_UNIT);
-            vertices.push(projected.x);
-            vertices.push(projected.y);
-            vertices.push(projected.z);
+            this.projected(new THREE.Vector3(x, elevationData[i], z), vertices, i * 3);
         }
-        const indices: number[] = []
+        const indexLength = 6 * (dataWidth - 1) * (dataHeight - 1);
+        const indices = indexLength > 65535 ? new Uint32Array(indexLength) : new Uint16Array(indexLength);
         for (let z = 0; z < dataHeight - 1; z++) {
             for (let x = 0; x < dataWidth - 1; x++) {
-                const topLeft = (z * dataWidth) + x;
+                const topLeft = z * dataWidth + x;
                 const topRight = topLeft + 1;
-                const bottomLeft = ((z + 1) * dataWidth) + x;
+                const bottomLeft = (z + 1) * dataWidth + x;
                 const bottomRight = bottomLeft + 1;
-                indices.push(topLeft);
-                indices.push(bottomLeft);
-                indices.push(topRight);
-                indices.push(topRight);
-                indices.push(bottomLeft);
-                indices.push(bottomRight);
+                const index = 6 * (z * (dataWidth - 1) + x);
+                indices[index] = topLeft;
+                indices[index + 1] = bottomLeft;
+                indices[index + 2] = topRight;
+                indices[index + 3] = topRight;
+                indices[index + 4] = bottomLeft;
+                indices[index + 5] = bottomRight;
             }
         }
         const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setIndex(indices);
+        geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
         return geometry;
+    }
+
+    generatePlane(x: number, z: number): THREE.BufferGeometry {
+        const vertices = new Float32Array(12);
+        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 0);
+        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 3);
+        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK), vertices, 6);
+        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK), vertices, 9);
+        const indices = new Uint16Array([0, 2, 1, 1, 2, 3]);
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+        return geometry;
+    }
+
+    getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
+        const x = xChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
+        const z = zChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
+        return this.projected(new THREE.Vector3(x, 0, z));
+    }
+
+    private projected(vertex: THREE.Vector3, vertices?: Float32Array, index?: number): THREE.Vector3 {
+        const projected = this.projection.project(vertex, this.radius).divideScalar(Constants.METER_PER_GL_UNIT);
+        if (vertices) {
+            vertices[index!] = projected.x;
+            vertices[index! + 1] = projected.y;
+            vertices[index! + 2] = projected.z;
+        }
+        return projected;
     }
 }

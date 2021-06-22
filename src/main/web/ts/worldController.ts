@@ -27,12 +27,12 @@ export default class WorldController {
         this.material = material;
         this.modelLoader = modelLoader;
         this.reload();
-        camera.addEventListener("viewChange", this.onViewChange.bind(this));
+        camera.addEventListener("viewChange", this.onViewChange.bind(this, false));
     }
 
     reload() {
         this.generateChunkBounds();
-        this.onViewChange();
+        this.onViewChange(true);
     }
 
     /**
@@ -47,7 +47,7 @@ export default class WorldController {
                 if (!this.chunkBounds[z]) {
                     this.chunkBounds[z] = [];
                 }
-                const plane = this.generatePlane(x, z, Constants.MOLA_METER_PER_CHUNK, Constants.MOLA_METER_PER_CHUNK);
+                const plane = this.modelLoader.generatePlane(x, z);
                 this.chunkBounds[z]![x]?.geometry.dispose();
                 this.chunkBounds[z]![x]! = new THREE.Mesh(plane);
                 this.chunkBounds1D.push(this.chunkBounds[z]![x]!);
@@ -55,37 +55,14 @@ export default class WorldController {
         }
     }
 
-    private generatePlane(x: number, z: number, width: number, height: number): THREE.BufferGeometry {
-        const vertices: Array<number> = [];
-        this.projected(new THREE.Vector3(x * width, 0, z * height), vertices);
-        this.projected(new THREE.Vector3(x * width + width, 0, z * height), vertices);
-        this.projected(new THREE.Vector3(x * width, 0, z * height + height), vertices);
-        this.projected(new THREE.Vector3(x * width + width, 0, z * height + height), vertices);
-        const indices = [0, 2, 1, 1, 2, 3]
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setIndex(indices);
-        return geometry;
-    }
-
-    private projected(vertex: THREE.Vector3, vertices?: number[]): THREE.Vector3 {
-        const projected = this.modelLoader.projection.project(vertex, this.modelLoader.radius).divideScalar(Constants.METER_PER_GL_UNIT);
-        if (vertices) {
-            vertices.push(projected.x);
-            vertices.push(projected.y);
-            vertices.push(projected.z);
-        }
-        return projected;
-    }
-
-    private async onViewChange() {
+    private async onViewChange(forceDispose = false) {
         const cameraProjection = new THREE.Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
         this.frustum.setFromProjectionMatrix(cameraProjection);
         const [chunksToLoad, chunkCount] = this.determineChunksToLoad();
         console.log("Visible: " + chunkCount);
         for (let z = 0; z < Constants.MOLA_CHUNKS_HEIGHT; z++) {
             for (let x = 0; x < Constants.MOLA_CHUNKS_WIDTH; x++) {
-                if (this.chunks[z] && this.chunks[z]![x] && !(chunksToLoad[z] && chunksToLoad[z]![x])) {
+                if (this.chunks[z] && this.chunks[z]![x] && (forceDispose || !(chunksToLoad[z] && chunksToLoad[z]![x]))) {
                     this.dispose(x, z);
                 }
             }
@@ -128,7 +105,7 @@ export default class WorldController {
     }
 
     private isOccluded(currentChunk: THREE.Mesh, x: number, z: number): boolean {
-        const direction = this.getMidPoint(x, z).sub(this.camera.position).normalize();
+        const direction = this.modelLoader.getMidPoint(x, z).sub(this.camera.position).normalize();
         this.raycaster.set(this.camera.position, direction);
         const intersections = this.raycaster.intersectObjects(this.chunkBounds1D);
         if (intersections.length === 0) {
@@ -136,12 +113,6 @@ export default class WorldController {
             return false;
         }
         return intersections[0]!.object !== currentChunk;
-    }
-
-    private getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
-        const x = xChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
-        const z = zChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
-        return this.projected(new THREE.Vector3(x, 0, z));
     }
 
     /**
