@@ -1,6 +1,5 @@
 export namespace Constants {
     export const CHUNK_SIZE_PIXELS = 2880;
-    export const GLOBAL_STRIDE = 16;
     export const METER_PER_GL_UNIT = 10000;
     export const MOLA_METER_PER_PIXEL = 463.0835744;
     export const MOLA_PIXELS_PER_GL_UNIT = 1 / MOLA_METER_PER_PIXEL / METER_PER_GL_UNIT;
@@ -15,4 +14,5 @@ export namespace Constants {
     export const ROTATION_SPEED = 0.002;
     export const SLIDER_SPEED = 2000;
     export const HUE_CUTOFF = 0.7;
+    export const VIEW_CHANGE_THROTTLE = 1000;
 }

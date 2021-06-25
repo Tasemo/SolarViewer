@@ -7,6 +7,7 @@ class ChunkEntry {
 
     isLoading = true;
     mesh: THREE.Mesh | undefined;
+    stride: number | undefined;
 }
 
 export default class WorldController {
@@ -59,7 +60,7 @@ export default class WorldController {
         const cameraProjection = new THREE.Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
         this.frustum.setFromProjectionMatrix(cameraProjection);
         const [chunksToLoad, chunkCount] = this.determineChunksToLoad();
-        console.log("Visible: " + chunkCount);
+        const stride = THREE.MathUtils.floorPowerOfTwo(chunkCount);
         for (let z = 0; z < Constants.MOLA_CHUNKS_HEIGHT; z++) {
             for (let x = 0; x < Constants.MOLA_CHUNKS_WIDTH; x++) {
                 if (this.chunks[z] && this.chunks[z]![x] && (forceDispose || !(chunksToLoad[z] && chunksToLoad[z]![x]))) {
@@ -70,7 +71,7 @@ export default class WorldController {
         for (let z = 0; z < Constants.MOLA_CHUNKS_HEIGHT; z++) {
             for (let x = 0; x < Constants.MOLA_CHUNKS_WIDTH; x++) {
                 if (chunksToLoad[z] && chunksToLoad[z]![x]) {
-                    this.load(x, z);
+                    this.load(x, z, stride);
                 }
             }
         }
@@ -122,33 +123,41 @@ export default class WorldController {
      * @param x the x position in chunk space
      * @param z the z position in chunk space
      */
-    private async load(x: number, z: number) {
-        if (!this.chunks[z] || !this.chunks[z]![x]) {
-            if (!this.chunks[z]) {
-                this.chunks[z] = [];
-            }
-            this.chunks[z]![x] = new ChunkEntry();
-            let loadX = x * Constants.CHUNK_SIZE_PIXELS;
-            let loadZ = z * Constants.CHUNK_SIZE_PIXELS;
-            let loadWidth = Constants.CHUNK_SIZE_PIXELS;
-            let loadHeight = Constants.CHUNK_SIZE_PIXELS;
-            if (x !== 0) {
-                loadX -= Constants.GLOBAL_STRIDE;
-                loadWidth += Constants.GLOBAL_STRIDE;
-            }
-            if (z !== 0) {
-                loadZ -= Constants.GLOBAL_STRIDE;
-                loadHeight += Constants.GLOBAL_STRIDE;
-            }
-            if (x === Constants.MOLA_CHUNKS_WIDTH - 1) {
-                loadWidth += Constants.GLOBAL_STRIDE;
-            }
-            const geometry = await this.modelLoader.load(loadX, loadZ, loadWidth, loadHeight);
-            const mesh = new THREE.Mesh(geometry, this.material)
-            this.chunks[z]![x]!.mesh = mesh;
-            this.chunks[z]![x]!.isLoading = false;
-            this.scene.add(mesh);
+    private async load(x: number, z: number, stride: number) {
+        if (!this.chunks[z]) {
+            this.chunks[z] = [];
         }
+        const existing = this.chunks[z]![x];
+        if (existing?.isLoading || existing?.stride === stride) {
+            return;
+        }
+        const chunk = new ChunkEntry();
+        this.chunks[z]![x] = chunk;
+        chunk.stride = stride;
+        let loadX = x * Constants.CHUNK_SIZE_PIXELS;
+        let loadZ = z * Constants.CHUNK_SIZE_PIXELS;
+        let loadWidth = Constants.CHUNK_SIZE_PIXELS;
+        let loadHeight = Constants.CHUNK_SIZE_PIXELS;
+        if (x !== 0) {
+            loadX -= stride;
+            loadWidth += stride;
+        }
+        if (z !== 0) {
+            loadZ -= stride;
+            loadHeight += stride;
+        }
+        if (x === Constants.MOLA_CHUNKS_WIDTH - 1) {
+            loadWidth += stride;
+        }
+        const geometry = await this.modelLoader.load(loadX, loadZ, loadWidth, loadHeight, stride);
+        const mesh = new THREE.Mesh(geometry, this.material);
+        chunk.mesh = mesh;
+        if (existing) {
+            existing.mesh!.geometry.dispose();
+            this.scene.remove(existing.mesh!);
+        }
+        chunk.isLoading = false;
+        this.scene.add(mesh);
     }
 
     private dispose(x: number, z: number) {

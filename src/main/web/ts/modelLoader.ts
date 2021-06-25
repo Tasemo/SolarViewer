@@ -25,19 +25,19 @@ export default class ModelLoader {
      * @param width the width in pixel space
      * @param height the height in pixel space
      */
-    async load(xPixel: number, zPixel: number, width: number, height: number): Promise<THREE.BufferGeometry> {
-        const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${Constants.GLOBAL_STRIDE}&width=${width}&height=${height}`;
+    async load(xPixel: number, zPixel: number, width: number, height: number, stride: number): Promise<THREE.BufferGeometry> {
+        const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${stride}&width=${width}&height=${height}`;
         const elevationData: number[] = await (await fetch(url)).json()
         const vertices = new Float32Array(3 * elevationData.length);
-        const dataWidth = width / Constants.GLOBAL_STRIDE;
-        const dataHeight = height / Constants.GLOBAL_STRIDE;
+        const dataWidth = width / stride;
+        const dataHeight = height / stride;
         for (let i = 0; i < elevationData.length; i++) {
-            const x = ((i % dataWidth) * Constants.GLOBAL_STRIDE + xPixel) * this.meterPerPixel;
-            const z = (Math.floor(i / dataWidth) * Constants.GLOBAL_STRIDE + zPixel) * this.meterPerPixel;
+            const x = ((i % dataWidth) * stride + xPixel) * this.meterPerPixel;
+            const z = (Math.floor(i / dataWidth) * stride + zPixel) * this.meterPerPixel;
             this.projected(new THREE.Vector3(x, elevationData[i], z), vertices, i * 3);
         }
         const indexLength = 6 * (dataWidth - 1) * (dataHeight - 1);
-        const indices = indexLength > 65535 ? new Uint32Array(indexLength) : new Uint16Array(indexLength);
+        const indices = vertices.length > 65535 ? new Uint32Array(indexLength) : new Uint16Array(indexLength);
         for (let z = 0; z < dataHeight - 1; z++) {
             for (let x = 0; x < dataWidth - 1; x++) {
                 const topLeft = z * dataWidth + x;

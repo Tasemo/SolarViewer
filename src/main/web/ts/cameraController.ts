@@ -1,11 +1,15 @@
 import * as THREE from "three";
 import { Constants } from "./constants";
+import Throttle from './throttle';
 
 export default class CameraController {
+
+    private readonly changeEvent = { type: "viewChange" };
 
     private camera: THREE.Camera;
     private movement = new THREE.Vector3();
     private dragging = false;
+    private eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
 
     constructor(camera: THREE.Camera) {
         this.camera = camera;
@@ -23,7 +27,7 @@ export default class CameraController {
             this.camera.translateX(scaled.x);
             this.camera.translateY(scaled.y);
             this.camera.translateZ(scaled.z);
-            this.camera.dispatchEvent({ type: "viewChange" });
+            this.eventThrottle.apply();
         }
     }
 
@@ -73,7 +77,7 @@ export default class CameraController {
         if (this.dragging) {
             this.camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * Constants.ROTATION_SPEED);
             this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * Constants.ROTATION_SPEED);
-            this.camera.dispatchEvent({ type: "viewChange" });
+            this.eventThrottle.apply();
         }
     }
 }
