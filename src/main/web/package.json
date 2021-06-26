@@ -14,7 +14,7 @@
     "webpack-cli": "^4.7.2"
   },
   "scripts": {
-    "build": "tsc && npx webpack && mkdir -p ../resources && cp -r ./css ./icons ./index.html ./js ./shader ../resources"
+    "build": "tsc && npx webpack && mkdir -p ../resources/static && cp -r ./css ./icons ./index.html ./js ./shader ../resources/static"
   },
   "repository": {
     "type": "git",

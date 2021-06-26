@@ -13,7 +13,7 @@ public final class SolarViewerServer {
     private SolarViewerServer() {}
 
     public static void main(String[] args) {
-        ResourceManager resourceManager = new ClassPathResourceManager(ClassLoader.getSystemClassLoader());
+        ResourceManager resourceManager = new ClassPathResourceManager(ClassLoader.getSystemClassLoader(), "static");
         ResourceHandler resourceHandler = Handlers.resource(resourceManager);
         RoutingHandler routingHandler = new RoutingHandler();
         routingHandler.add(Methods.GET, "/*", resourceHandler);
