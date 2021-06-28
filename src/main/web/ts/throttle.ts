@@ -2,7 +2,8 @@ export default class Throttle {
 
     private func: Function;
     private limitMs: number;
-    private inThrottle = false;
+    private lastRunTime = Date.now();
+    private lastTimeout: number | undefined;
 
     constructor(func: Function, limitMs: number) {
         this.func = func;
@@ -10,10 +11,10 @@ export default class Throttle {
     }
 
     apply(...args: any[]) {
-        if (!this.inThrottle) {
+        window.clearTimeout(this.lastTimeout);
+        this.lastTimeout = window.setTimeout((() => {
             this.func.apply(args);
-            this.inThrottle = true;
-            window.setTimeout((() => this.inThrottle = false).bind(this), this.limitMs);
-        }
+            this.lastRunTime = Date.now();
+        }).bind(this), this.limitMs - (Date.now() - this.lastRunTime));
     }
 }
