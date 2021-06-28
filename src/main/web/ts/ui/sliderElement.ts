@@ -1,6 +1,6 @@
 import { Constants } from "../constants";
 
-export default class SliderElement {
+export default abstract class SliderElement {
 
     private element: HTMLElement;
     private scrollOffset: number;

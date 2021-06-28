@@ -106,8 +106,9 @@ export default class WorldController {
     }
 
     private isOccluded(currentChunk: THREE.Mesh, x: number, z: number): boolean {
-        const direction = this.modelLoader.getMidPoint(x, z).sub(this.camera.position).normalize();
-        this.raycaster.set(this.camera.position, direction);
+        const worldPosition = this.camera.getWorldPosition(new THREE.Vector3());
+        const direction = this.modelLoader.getMidPoint(x, z).sub(worldPosition).normalize();
+        this.raycaster.set(worldPosition, direction);
         const intersections = this.raycaster.intersectObjects(this.chunkBounds1D);
         if (intersections.length === 0) {
             // most likely a rounding error, the ray in the direction of the point should always hit the point itself

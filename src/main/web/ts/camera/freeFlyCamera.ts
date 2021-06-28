@@ -1,15 +1,17 @@
 import * as THREE from "three";
-import { Constants } from "./constants";
-import Throttle from './throttle';
+import { Constants } from "../constants";
+import Throttle from '../throttle';
+import CameraController from './cameraController';
 
-export default class CameraController {
+export default class FreeFlyCamera implements CameraController {
 
     private readonly changeEvent = { type: "viewChange" };
 
+    enabled = true;
     private camera: THREE.Camera;
     private movement = new THREE.Vector3();
-    private dragging = false;
     private eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
+    private dragging = false;
 
     constructor(camera: THREE.Camera) {
         this.camera = camera;
@@ -27,12 +29,13 @@ export default class CameraController {
             this.camera.translateX(scaled.x);
             this.camera.translateY(scaled.y);
             this.camera.translateZ(scaled.z);
+            this.camera.updateMatrixWorld(true);
             this.eventThrottle.apply();
         }
     }
 
     private onKeyDown(event: KeyboardEvent) {
-        if (!event.repeat) {
+        if (this.enabled && event.repeat) {
             switch (event.code) {
                 case "KeyW":
                     this.movement.z = -Constants.MOVEMENT_SPEED;
@@ -45,12 +48,6 @@ export default class CameraController {
                     break;
                 case "KeyD":
                     this.movement.x = Constants.MOVEMENT_SPEED;
-                    break;
-                case "KeyQ":
-                    this.movement.y = Constants.MOVEMENT_SPEED;
-                    break;
-                case "KeyE":
-                    this.movement.y = -Constants.MOVEMENT_SPEED;
                     break;
             }
         }
@@ -66,17 +63,14 @@ export default class CameraController {
             case "KeyD":
                 this.movement.x = 0;
                 break;
-            case "KeyQ":
-            case "KeyE":
-                this.movement.y = 0;
-                break;
         }
     }
 
     private onMouseMove(event: MouseEvent) {
-        if (this.dragging) {
+        if (this.enabled && this.dragging) {
             this.camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * Constants.ROTATION_SPEED);
             this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * Constants.ROTATION_SPEED);
+            this.camera.updateMatrixWorld(true);
             this.eventThrottle.apply();
         }
     }

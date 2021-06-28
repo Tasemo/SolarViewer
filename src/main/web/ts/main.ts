@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import ModelLoader from './modelLoader';
-import CameraController from './cameraController';
 import { Constants } from "./constants";
 import WorldController from './worldController';
 import { Projections } from "./projections";
@@ -8,7 +7,7 @@ import InfoArea from './ui/infoArea';
 import ConfigArea from './ui/configArea';
 
 let renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera;
-let cameraController: CameraController;
+let configArea: ConfigArea, infoArea: InfoArea;
 let lastTime = performance.now();
 
 window.addEventListener("load", async () => {
@@ -19,7 +18,6 @@ window.addEventListener("load", async () => {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
     camera.translateZ(Constants.MOLA_RADIUS_METERS * 1.5 / Constants.METER_PER_GL_UNIT)
     camera.updateMatrixWorld();
-    cameraController = new CameraController(camera);
 
     const material = new THREE.ShaderMaterial({
         uniforms: {
@@ -37,8 +35,8 @@ window.addEventListener("load", async () => {
     const modelLoader = new ModelLoader("mola", Constants.MOLA_METER_PER_PIXEL, Projections.SPHERICAL, Constants.MOLA_RADIUS_METERS);
     const worldController = new WorldController(camera, scene, material, modelLoader);
 
-    new InfoArea(worldController);
-    new ConfigArea(worldController, material.uniforms);
+    infoArea = new InfoArea(worldController);
+    configArea = new ConfigArea(worldController, material.uniforms);
     render();
 });
 
@@ -51,7 +49,7 @@ window.addEventListener("resize", () => {
 function render() {
     const currentTime = performance.now();
     const delta = (currentTime - lastTime) / 1000;
-    cameraController.update(delta);
+    configArea.current.update(delta);
     renderer.render(scene, camera);
     lastTime = currentTime;
     requestAnimationFrame(render);

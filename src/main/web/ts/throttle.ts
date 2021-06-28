@@ -13,7 +13,7 @@ export default class Throttle {
         if (!this.inThrottle) {
             this.func.apply(args);
             this.inThrottle = true;
-            setTimeout((() => this.inThrottle = false).bind(this), this.limitMs);
+            window.setTimeout((() => this.inThrottle = false).bind(this), this.limitMs);
         }
     }
 }
