@@ -38,15 +38,19 @@ export default class FreeFlyCamera implements CameraController {
         if (this.enabled && event.repeat) {
             switch (event.code) {
                 case "KeyW":
+                case "ArrowUp":
                     this.movement.z = -Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyA":
+                case "ArrowLeft":
                     this.movement.x = -Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyS":
+                case "ArrowDown":
                     this.movement.z = Constants.MOVEMENT_SPEED;
                     break;
                 case "KeyD":
+                case "ArrowRight":
                     this.movement.x = Constants.MOVEMENT_SPEED;
                     break;
             }
@@ -56,11 +60,15 @@ export default class FreeFlyCamera implements CameraController {
     private onKeyUp(event: KeyboardEvent) {
         switch (event.code) {
             case "KeyW":
+            case "ArrowUp":
             case "KeyS":
+            case "ArrowDown":
                 this.movement.z = 0;
                 break;
             case "KeyA":
+            case "ArrowLeft":
             case "KeyD":
+            case "ArrowRight":
                 this.movement.x = 0;
                 break;
         }
