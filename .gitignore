@@ -6,3 +6,13 @@ installs
 node_modules
 data
 resources
+*.out
+*.log
+*.aux
+*.bbl
+*.blg
+*.lof
+*.run.xml
+*.gz
+*.toc
+*-blx.bib

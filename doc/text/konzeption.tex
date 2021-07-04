@@ -1,0 +1,89 @@
+\chapter{Konzeption}
+
+\section{Programmiersprache}
+Die Wahl der richtigen Programmiersprache ist mehr als nur reine Präferenz, da jede Sprache projektrelevante Eigenheiten hat. Im folgenden werden daher drei Programmiersprachen auf ihre Projekttauglichkeit evaluiert. Für dieses Projekt irrelevante Aspekte wie zum Beispiel Sprachfeatures oder Paradigmen fließen in die Bewertung nicht mit ein.
+
+Der wichtigste Faktor aus Projektsicht ist das Zielsystem, auf die Software schlussendlich laufen wird. Idealerweise sollte es die Sprache erlauben die Software, ohne große Veränderungen, auf eine andere Plattform zu portieren. Hier sind dann Betriebssystem- und Hardware-Unabhängigkeit von großer Bedeutung um dies zu erleichtern. Ein weiterer Aspekt ist die Geschwindigkeit, auch wenn sie einen deutlich kleineren Stellenwert einnimmt, da der Einfluss einer Sprache auf die Gesamtperformance der Anwendung äußerst gering ist und dort wichtigere Aspekte bevorzugt werden sollten\footnote{“premature optimization is the root of all evil” - Sir Tony Hoare}. Ein weiterer wichtiger Punkt ist das Vorhandensein von Tools, welche den Entwicklungsprozess unterstützen können. Hier sind zum Beispiel Debugger, Profiler oder Analyse-Tools zu nennen, mit denen die Performance der Anwendung evaluiert werden kann. Auch das Vorhandensein von Frameworks ist nicht zu unterschätzen, da sie zur Einhaltung des Projektzeitraumes benötigt werden und gerade im Bereich der Grafikprogrammierung nicht für jede Sprache existieren. Schlussendlich müssen auch persönliche Fähigkeiten und Erfahrungen genannt werden. Das Lernen einer neuen Sprache ist zeitintensiv und führt außerdem zu einer erhöhten Fehleranfälligkeit.
+
+\subsection{Java}
+Java ist eine objektorientierte Sprache mit sehr hohem Abstraktionsniveau. Sie wird in einer virtuellen Maschine namens Java Virtual Machine (JVM) ausgeführt und ist somit Betriebssystem- und Hardware unabhängig. Dadurch ist das Kriterium der guten Verfügbarkeit erfüllt und eine möglichst große Zielgruppe kann angesprochen werden. Insbesondere Smartphones sind hier als Zielplattform zu erwähnen, da hier die Entwicklung von Apps mit Java favorisiert wird. Auch das Motto “Write Once, Runs Everywhere”, welches sich unter anderem in der Rückwärtskompatibilität bis zur ersten Java Version von vor über 25 Jahren manifestiert, ist für die meisten Softwareprojekte, inklusive diesem, sehr vorteilhaft, da keine Änderungen am Code notwendig sind und die Software weiterhin auf neueren JVMs lauffähig bleibt.
+
+Allerdings beeinträchtigt die Nutzung einer virtuellen Maschine die Nutzung von nativen, also Betriebssystem abhängigen Ressourcen außerhalb dieser isolierten Umgebung, insbesondere den OpenGL Implementationen. Unter anderem verwaltet die JVM jeglichen Speicher, was eine Übergabe von zum Beispiel Speicheradressen (Pointer) von Objekten im Java Heap an OpenGL unmöglich macht. Auch die verfügbaren Referenzen existieren natürlich nur im Kontext der virtuellen Maschine. Als Lösung bietet Java die Nutzung von sogenannten direct buffer an, welche außerhalb der Java Heaps liegen und nicht von der JVM verwaltet werden\footnote{\url{https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/nio/ByteBuffer.html}}. Hier ist dann ein ständiges Kopieren zwischen Heap und Buffer notwendig, was vor allem bei der Übergabe großer Vertex Daten problematisch ist. Hier ist viel manuelles Kopieren und das Serialisieren von komplexen Objekten in die Buffer notwendig. Auch die allgemeine Kommunikation mit dem OpenGL Treiber besitzt einen Performance Overhead, der nicht zu vernachlässigen ist.
+
+Aufgrund des Alters der Sprache und seiner hohen Beliebtheit\footnote{seit 2001 in den Top 3 der beliebtesten Sprachen: \url{https://www.tiobe.com/tiobe-index/java/}} existiert ein sehr große Community im Umfeld der Sprache, welcher auch oft als Java Ecosystem beschrieben wird. Dies zeigt sich in einem sehr guten Tooling-Support und einer Implementation der meisten größeren Frameworks in dieser Sprache. Abschließend kann auch die hohe persönliche Expertise mit dieser Sprache als Vorteil genannt werden.
+
+\subsection{C++}
+C++ ist eine objektorientierte Sprache mit niedrigerem Abstraktionsniveau als Java. Sie besitzt keine automatische Speicherverwaltung (keine Garbage Collection und explizite Speicher-Allokationen und -Referenzierung). Auch wird sie direkt zu Maschinencode kompiliert und direkt ausgeführt, sodass sie im Allgemeinen als schneller angesehen wird. Die heißt aber auch, dass für jedes Betriebsystem (bzw. sogar für jede CPU) ein eigenes Kompilat erzeugt werden muss. Auch das Web und Smarthphones können nicht ohne weiteres mit dieser Sprache angesprochen werden, was zu einer Verkleinerung der Zielgruppe führt.
+
+Eine kurze Suche nach dem Begriff OpenGL in Repositories auf github.com zeigt, dass sie mit Abstand die meistgenutzte Sprache bei der Entwicklung von Grafikanwendungen mit OpenGL ist\footnote{\url{https://github.com/search?q=opengl&type=Repositories}}. Sie besitzt mit über 27.800 von 60.600 Resultaten einen Anteil von über 45\%. Java dagegen besitzt mit über 5000 Resultaten nur einen Anteil von 8\%. Aufgrund der hohen Nutzung der Sprache in der Grafikprogrammierung existieren sehr viele Frameworks, die für dieses Projekt benötigt werden könnten. Auch erleichtert das 
+
+\subsection{JavaScript/TypeScript}
+JavaScript ist eine schwach und dynamisch typisierte Skriptsprache, welche unter anderem im Browser ausgeführt wird. Da ein Browser auf nahezu jedem Computer oder Smartphone verfügbar ist, ist auch hier keine Einschränkung der Zielgruppe notwendig. Die Verbreitung kann sogar minimal größer als Java angesehen werden, da keine Installation einer JVM notwendig ist. Es existiert auch eine Sprache namens TypeScript, welche die Sprache um statische Typisierung erweitert. Die Sprache wird dabei in JavaScript transpiliert\footnote{im Gegensatz zum Kompilieren findet keine Verringerung des Abstraktionslevels statt}, sodass die Ausführung im Browser weiterhin funktioniert. Das heißt aber auch, dass die Typensicherheit nicht zur Laufzeit überprüft werden kann.
+
+Der größte Vorteil bei der Nutzung eines Browsers ist die sehr einfache Gestaltung von Benutzeroberflächen (UI). Mit Hilfe von HTML und CSS … Integration von JavaScript
+
+HTML + CSS -> einfache UI
+
+gleiche Nachteile wie Java mit der isolierten Umgebung -> allerdings WebGL
+% Vorteil: keine Probleme aus Programsicht, die gesamte Lo
+% Vorteil: kein Fenster- und OpenGL-Kontext-Management. Normalerweise hätte dafür ein eigenes Framework integriert werden müssen (z.B. GLFW), da dies natürlich Betriebssystemabhängig ist und eine Anpassung an alle möglichen Systeme ein immenser Arbeitsaufwand ist. Auch Benutzereingaben über Maus und Tastatur abgedeckt, was in nativen Anwendungen immer mit einigem Aufwand verbunden ist.
+
+% Kernanforderung sehr hohe Skalierbarkeit, daher Kernanforderung geringer Arbeitsspeicher -> vollständiges Lader der Datenquelle in der Arbeitsspeicher keine Option, daher Speichern im Dateisystem -> kein Dateisystem im Browser, also wurde 
+
+\subsection{Fazit}
+Trotz der Nachteile wurde das Web als Zielplattform ausgewählt. Die Hauptursachen dafür sind die hohe Verfügbarkeit und die einfache UI Gestaltung. Als konkrete Sprache wurde TypeScript gewählt, da die eine starke Typisierung das Arbeiten mit einer unbekannten API stark erleichtert.
+
+% Java als Backend Sprache auf Grund da:
+%% Java als Backend sehr häufig genutzt wird und durch das riesige Ecosystem daher sehr viele Resourcen zur Entwicklung eines Webservers (z.B. Bibliotheken) vorhanden sind
+%% ImageIO-API zum Auslesen der Höhendaten existiert, welches auch mit TIFF Dateien klar kommt und auch Auschnitte aus dem Bild (die dann den jeweiligen Abschnitten entsprechen)
+%% eigene gute Erfahrungen mit der Sprache, was die Entwicklungszeit deutlich verkürtzt
+
+\section{Bibliotheken}
+
+\subsection{Webserver}
+Die Aufgabe des Webserver ist das Bereitstellen der statischen Webseite, die die Hauptanwendung mit der Visualisierung beinhaltet, und das Bereitstellen der Höhendaten zu bestimmten Koordinaten. Aus diesen Aufgaben ergibt sich ein sehr einfaches Anforderungsprofil an die Webserver Bibliothek und insbesondere Features, welche oftmals mit Webservern assoziiert werden, werden nicht benötigt. Dazu zählen zum Beispiel Benutzerauthentifizierung, Anfrageratenlimitierung, Firewalls, Proxies oder andere Sicherheitsaspekte. Weitere Aspekte, welche nicht benötigt werden, sind das Bereitstellen und Empfangen von Dateien, das Automatische Parsing von JSON in Java Objekte und anders herum, Routing von bestimmten Requests zu bestimmten Endpoints oder die Unterstützung von Websockets. Auch das Bereitstellen einer verschlüsselten Kommunikation über HTTPS ist im konkreten Anwendungsfall nicht nötig, da keine nutzerbezogene Daten vorhanden sind. Da viele Nutzer und Browser das Fehlen dieses Features als Sicherheitsrisiko sehen und die Anwendung dadurch potentiell meiden, wird das Vorhandensein dieses Features trotzdem als positiv bewertet.
+
+Als wichtig erachtet wird als erstes eine geeignete Lizenz. Diese muss eine kostenlose Nutzung, potentiell auch in einem kommerziellem Umfeld, erlauben und darf einer Weiternutzung in OpenSource Projekten nicht im Wege stehen. Idealerweise sollte die Bibliothek selbst als OpenSource Projekt entwickelt werden, da so Probleme und Features transparenter sind, was die Wahl und die spätere Entwicklung vereinfacht. Ein weiterer positiver Aspekt ist die Unterstützung von HTTP/2 oder sogar HTTP/3. Diese bringen durch verbesserte Features wie Header Kompression, Multiplexing über eine geteilte TCP Verbindung oder das Senden von Ressourcen ohne vorigen Request (HTTP/2 Server Push) schon allein durch die Nutzung einen Performancegewinn, ohne dass Änderungen an der Anwendung notwendig sind. Des Weiteren soll der Webserver als eigenständige Java Anwendung (JAR) laufen können und kein manuelles Deployment in ein Application Server wie Tomcat benötigen (siehe Java Servlet Technologie). Das die Anfragen in einer nicht blockierenden Weise abgearbeitet werden können, sollte natürlich selbstverständlich sein, um einen Mehrbenutzerbetrieb auf vernünftige Weise zu ermöglichen.
+
+Mit diesen Anforderungen soll ein Bibliothek gefunden werden, welche einen möglichst minimalen Umfang besitzt und nur die hier beschriebenen Features unterstützt. Als erstes wurde die Möglichkeit evaluiert, überhaupt keine externen Abhängigkeiten zu nutzen und mit den Java internen Klassen die Anforderungen umzusetzen. Dazu zählt zum einen die direkte Verwendung von Sockets …
+Des Weiteren ist in den meisten JDK Implementationen das package com.sun.net.httpserver enthalten, welches einen vollwertigen Webserver enthält. Dieser entspricht zwar, neben der Unterstützung von HTTP/2, fast allen Anforderungen, allerdings ist dieses package nicht Teil des Java Standards. Es ist zwar in den beiden großen Implementationen Oracle JDK und OpenJDK enthalten, allerdings kann sich das jederzeit ändern. Da die Anwendung auch für spätere Java Versionen oder sogar andere JDK Implementationen portierbar bleiben soll, wurde diese Möglichkeit ausgeschlossen.
+
+% https://syntaxcorrect.com/Java/5_Ultra_Lightweight_Http_Server_Implementations_in_Java_for_Blazing_Fast_Microservices_APIs_or_Even_Websites
+% Spring Boot ausschließen, da der Featureumfang zu groß ist und dadurch auf Performancenachteile gegenüber kleineren Bibliotheken besitzt
+% NanoHttpd erwähnen als gute Alternative, allerdings kein Http/2, ansonsten aber sehr minimalistisch und moderne API mit funktionalem Stil. https://github.com/NanoHttpd/nanohttpd
+% Schlussendlich habe ich mich für Undertow entschieden. Apache 2.0 Lizenz, kostenlos und selbst OpenSource, unterstützt zwar potentiell auch Dinge wie Websockets oder Servlets, allerdings ist die Anwendung so modular gestaltet, dass nur der einfache Webserver in die Anwendung integriert werden kann. API sehr übersichtlich und man definiert eine Kette von Handlern (Chain-of-responsibility pattern), die auf bestimmte Requests reagieren können
+
+\subsection{Grafik/Mathematik}
+Ein ursprünglicher Gedanke hinter diesem Projekt war die direkte Nutzung von OpenGL, ohne weitere Abhängigkeiten. Insbesondere sollten keine vollständigen Grafikengines wie Unity oder Unreal verwendet werden, da sie das Projekt unnötig aufgebläht hätten und die Nutzung dieser das Arbeiten auf geringerem Abstraktionsniveau (prozedurales Erstellen von Modellen oder das gezielte Steuern des Ladevorgangs) erschwert hätten. Außerdem erschweren diese Engines das Deployment im Web, da teilweise eigene Laufzeitumgebungen (z.B. Unity Web Player) bereitgestellt werden müssen [CITE NEEDED]. Trotzdem wurde nach einigem Prototyping entschieden, zumindest eine minimale Unterstützung durch eine Bibliothek zu nutzen. Dies ist vor allem durch den relativ großen Arbeitsaufwand bei der Verwendung von reinem OpenGL begründet. Hier müssen selbst für kleine Programme mehrere hundert Zeilen Code geschrieben werden und [BOILERPLATE].
+
+% Mathematik teilweise zu kompliziert und Fehler hätten sich dadurch leicht eingeschlichen
+% außerdem Definitonen von bekannten Typen wie Vektoren oder Matrizen notwendig, auch hier ist eine erneute Definition unnötiger Arbeitsaufwand
+
+% Entscheidung für Three.js -> schreib vorher noch über ein paar Alternativen
+
+\section{Architektur}
+Die Architektur der Anwendung gliedert sich in das Frontend und das Backend. Vor allem das Frontend ist stark durch die Einschränkung beeinflusst, dass jegliche OpenGL Kommandos von dem Thread ausgeführt werden müssen, welcher aktuell den OpenGL Kontext besitzt. Dies ist normalerweise der Thread, welcher ihn ursprünglich angelegt hatte. Es ist zwar möglich, den Kontext zwischen Threads zu wechseln, dies ist jedoch einer der teuersten Operationen in OpenGL und macht meistens die Performance Verbesserungen durch die Nutzung von Threads zunichte. Gleichzeitig sollen natürlich Abschnitte, welche nichts mit OpenGL zu tun haben, so gut es geht parallelisiert werden. Daraus folgt, dass oftmals eine Synchronisation zwischen verschiedenen Threads notwendig ist, damit diese sich wieder in den Hauptthread vereinen können.
+
+Ein weiterer Kernaspekt der Architektur ist die Unterteilung der Welt in Abschnitte, im folgenden auch oft als chunks bezeichnet. Dies ist bedingt durch die große Datenmenge, welches ein vollständiges Laden in den Arbeits-/Grafikspeicher nicht möglich macht (siehe TODO). Es wurde sich für die Nutzung von chunks in festen Größen, im konkreten TODO, entschieden, da es 
+
+In Abbildung 1 ist ein Aktivitätsdiagramm dargestellt, welches den geplanten Ablauf der Welterstellung auf Client-Seite grob darstellt. Die Aktivität wird durch jede Veränderung der Kamera durch den Benutzer gestartet. Dazu zählt die Translation durch die Benutzung der Pfeiltasten, die Rotation durch die Benutzung der Maus und die Skalierung oder Zoom durch die Benutzung des Mausrads. Als erstes wird eine Liste mit allen möglichen chunks berechnet, welche den Sichtbereich der Kamera (Frustum) auch nur ansatzweise schneiden. Diese Liste wird verglichen mit einer Liste aller aktuellen chunks, um neue und nicht mehr benötigte Abschnitte zu ermitteln. Die rohen Höhendaten des Abschnitt werden vom Server angefragt. Da dies noch keine Interaktion mit OpenGL benötigt und potentiell mehrere Abschnitte angefragt und transformiert werden müssen, habe ich hier eine erste Parallelisierung, durch die Nutzung von Web Worker, geplant. Als nächstes müssen die Höhendaten in dreidimensionale Koordinaten auf einer Kugel transformiert werden. Die Formel dafür lautet TODO. Abschnitte, welche aktuell vorhanden sind, aber nicht mehr sichtbar sind, müssen vollständig entladen werden. Hierbei ist darauf zu achten, auch die Ressourcen auf GPU Seite frei zu stellen, da dies natürlich nicht durch die automatische garbage collection auf JavaScript Seite abgedeckt ist. 
+
+Ein weiteres Problem, was durch die Benutzung von chunks auftritt, ist das TODO [inklusive Bild von nicht verbundenen chunks]
+
+
+Chunks, welche aktuell vorhanden sind, aber nicht mehr in der Liste der sichtbaren chunks, müssen 
+
+
+\section{User Interface}
+% Insert Mock Up
+% Hauptkriterium: Visualisierung soll nicht durch unnötige Informationen gestört werden, User soll selbst entscheiden, was er angezeigt haben möchte
+% 3 Bereiche, Visualisierung, Konfiguration und Informationen
+% Visualiserung im Mittelpunkt, beidenen anderen Bereiche sollen sich bei Bedarf ein- und Ausklappen können
+% FontAwesome 5 für die Icons
+% slider initial eingeklappt damit der User weiß, auf welche Teil des sliders er zum Öffnen und Schließen klicken muss
+% überlege was für Features: Farbskala muss angezeigt werden, mindestens auch der maximale und minimale Höhenwert am Rand der Skala
+% Ränder der Skale sollten konfigurierbar sein, da unterschiedliche Planeten natürlich unterschiedliche Höhen aufweisen
+% Ein- und Ausschalten der Projektion (Art der Projektion hängt natürlich von den verwendeten Daten ab, also sollte vom User nicht spezifiziert werden können)
+% latitude, longitude und altitude für einen Punkt auf dem Globus, wie krieg ich den User dazu zu erkennen, dass er da rauf klicken muss?
+% eigenes Konfigurationen für Einheiten (radians vs degrees, metrisch vs imperial) wünschenswert
+% Genauigkeit alles angezigten Werte konfigurierbar machen (Anzahl Stellen nach dem Komma)

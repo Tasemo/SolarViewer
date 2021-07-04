@@ -1,0 +1,49 @@
+\chapter{Grundlagen}
+
+\section{Datenquellen}
+Die Datengrundlage für dieses Projekt sind Daten des Mars Orbiter Laser Altimeter (MOLA), einem Höhenmessgerät an Bord des 
+               
+
+% Beschreibe die MOLA Mission und mit welchen Instrumenten sie erfasst wurden
+
+% Beschreibe die Parameter (Auflösung, Datengröße, Genauigkeit (horizontal/vertikal))
+% Beschreibe das Datenformat und Unterschiede / Vor- und Nachteile
+
+%% https://pds-geosciences.wustl.edu/missions/mgs/megdr.html vs. https://astrogeology.usgs.gov/search/details/Mars/GlobalSurveyor/MOLA/Mars_MGS_MOLA_DEM_mosaic_global_463m
+%% entscheide dich für die 2., auch wenn du das Format des 1. besser findest <-- da beim 1. Daten fehlen und das Mapping Auf Kugel dann schwierig wird
+%% beschreibe, warum das Format nicht gut ist -> beschreibe Aufbau von TIFF Dateien (Container-Format, Daten an verschiedenen Stellen in der Datei) -> decoder benötigt
+
+\section{OpenGL}
+% Grundlagen: nur Interface, verschiedene Implementationen in Form von Driver
+% existiert auch WebGL ← Unterschiede und Gemeinsamkeiten, z.B. 
+% Erklärung Shader Pipeline
+% Erklärung Kommunikation mit Shader (Attribut vs Uniform)
+% Koodinaten Systeme -> wie verlaufen die Achsen (positive x-Achse nach rechts, positive y-Achse nach oben und positive z-Achse in den Bildschirm hinein)
+
+\section{Datenreduzierung}
+
+\subsection{Datenmenge}\label{datenmenge}
+
+\subsection{Verlustfrei}
+
+\subsection{Verlustbehaftet}
+% Abschnitt, der erstmal die vollständige Datengröße beschreibt
+% außerdem ist es ein Rasterformat, also feste Abstände zwischen einzelnen Datenpunkten
+
+% verlustfrei: alles was nicht im Sichtbereich der Kamera liegt (Frustum Culling) und alles, was durch andere Dinge verdeckt wird (Occlusion Culling) -> andere Seite des Globus
+% dazu Unterteilung der Welt in Abschnitte (chunks) und nur Anzeigen der Abschnitte, welche den Sichtbreich auch nur ansatzweise schneiden und nicht vollständig durch andere Abschnitte verdeckt sind
+% verlustbehaftet: 
+% hier ausnutzen, dass zum Beispiel bei geringen Zoomstufen Unterschiede in den Daten nicht mehr wahrgenommen werden können
+% Außerdem: Entfernung von Redundanzen -> da Rasterformat , hier ist es abhängig von der Komplexität des Terrains,
+
+% Redukttion der Datenmenge in festgelegten Schritten (stride), systemetaische Reduktion
+% Reduktion der Datenmenge abhängig vom umliegenden Terrain -> ähnliche vertices müssen nicht wiederholt werden,
+% gerade bei natürlichen Daten gibt es sehr ähnliche Pubkt
+
+% eine Plane besteht zwar auf 4 Eckpunkten, allerdings muss sie in OpenGL Primitives zerlegt werden -> dies sind normalerweise Dreiecke, also 6 Eckpunkte, da ja jeder Eckpunk auch Teil des benachbartenn PLane ist, wird insgesamt ein Eckpunkt 6 mal wiederholt (siehe kleine Grafik) -> also wird bei der Erzeugung des Modell eine Indexierung vorgenommen, einfach eine Liste mit Indexen die eine die Liste mit den Vertex-Daten referenziert ->
+% bei der systematischen Reduktion ist das kein Problem, die Indixierung des Raster Modells bleibt erhalten, nur die Abstände zwischen den Vertices erhöhen sich
+
+% erwähne die Formel um aus einem 1D Array ein 2D Array zu erstellen
+
+% bei der asymetrischen Reduktion kann nicht mehr aus dem 1D Vertex-Format auf eine Indexierung geschlossen werden, also muss hier ein 2D Format gesendet werden was die entfernen
+% Vertex-Daten kennzeichnet

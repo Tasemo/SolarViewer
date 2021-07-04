@@ -1,0 +1,34 @@
+\documentclass[a4paper, 12pt, oneside]{scrbook}
+\usepackage[margin=2.5cm, bindingoffset=0.5cm]{geometry}
+
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{xcolor}
+\usepackage[ngerman]{babel}
+\usepackage{csquotes}
+\usepackage[parfill]{parskip}
+\usepackage[backend=bibtex, style=numeric]{biblatex}
+\addbibresource{thesis.bib}
+\raggedright
+
+\begin{document}
+
+\input{text/titel}
+\frontmatter
+\input{text/kurzbeschreibung}
+\tableofcontents
+\listoffigures
+\mainmatter
+\input{text/einfuehrung}
+\input{text/grundlagen}
+\input{text/methodologie}
+\input{text/anforderungsanalyse}
+\input{text/konzeption}
+\input{text/implementierung}
+\input{text/evaluation}
+\input{text/fazit}
+\backmatter
+\printbibliography
+\end{document}
