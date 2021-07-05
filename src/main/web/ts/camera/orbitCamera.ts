@@ -8,14 +8,14 @@ export default class OrbitCamera implements CameraController {
     private readonly changeEvent = { type: "viewChange" };
 
     enabled = true;
-    private camera: THREE.Camera;
-    private eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
+    private readonly camera: THREE.Camera;
+    private readonly eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
     private dragging = false;
-    private minDistance: number;
-    private maxDistance: number;
-    private pivot = new THREE.Object3D();
+    private readonly minDistance: number;
+    private readonly maxDistance: number;
+    private readonly pivot = new THREE.Object3D();
 
-    constructor(camera: THREE.Camera, target: THREE.Vector3, minDistance = 0, maxDistance = Infinity) {
+    constructor(camera: THREE.Camera, target: THREE.Vector3, minDistance = 0, maxDistance = Number.MAX_VALUE) {
         this.camera = camera;
         this.pivot.position.copy(target);
         this.pivot.add(camera);
@@ -24,9 +24,25 @@ export default class OrbitCamera implements CameraController {
         window.addEventListener("mousedown", (() => this.dragging = true).bind(this));
         window.addEventListener("mouseup", (() => this.dragging = false).bind(this));
         window.addEventListener("mousemove", this.onMouseMove.bind(this));
+        window.addEventListener("wheel", this.onMouseWheel.bind(this));
     }
 
     update(frameTimeSeconds: number) { }
+
+    private onMouseWheel(event: WheelEvent) {
+        let change = Math.sign(event.deltaY) * 2;
+        const current = this.camera.position.z;
+        if (change + current > this.maxDistance) {
+            change = this.maxDistance - current;
+        } else if (change + current < this.minDistance) {
+            change = this.minDistance - current;
+        }
+        if (change !== 0) {
+            this.camera.translateOnAxis(new THREE.Vector3(0, 0, 1), change);
+            this.camera.updateMatrixWorld(true);
+            this.eventThrottle.apply();
+        }
+    }
 
     private onMouseMove(event: MouseEvent) {
         if (this.enabled && this.dragging) {
