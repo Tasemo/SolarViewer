@@ -27,8 +27,8 @@ public final class MolaDataRedundancy {
         if (maxArea.x >= MIN_KERNEL_SIZE && maxArea.z >= MIN_KERNEL_SIZE) {
             for (int z = 0; z < maxArea.z; z++) {
                 for (int x = 0; x < maxArea.x; x++) {
-                    if ((x != 0 || z != 0) && (x != 0 || z != maxArea.z - 1) &&
-                            (x != maxArea.x - 1 || z != 0) && (x != maxArea.x - 1 || z != maxArea.z - 1)) {
+                    if (x != 0 && x != maxArea.x - 1 && z != 0 && z != maxArea.z - 1) {
+                        assert data[currentZ + z][currentX + x] != replacement;
                         data[currentZ + z][currentX + x] = replacement;
                     }
                     visited[currentZ + z][currentX + x] = true;
@@ -70,6 +70,7 @@ public final class MolaDataRedundancy {
                 } else if (currentRowSize < widthAndHeight.x) {
                     widthAndHeight = new Coordinates(widthAndHeight);
                     result.add(widthAndHeight);
+                    break;
                 } else {
                     break;
                 }
@@ -97,6 +98,7 @@ public final class MolaDataRedundancy {
                 } else if (currentColumnSize < widthAndHeight.z) {
                     widthAndHeight = new Coordinates(widthAndHeight);
                     result.add(widthAndHeight);
+                    break;
                 } else {
                     break;
                 }
