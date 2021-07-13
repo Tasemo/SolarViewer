@@ -8,11 +8,13 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.Methods;
 
+import java.io.IOException;
+
 public final class SolarViewerServer {
 
     private SolarViewerServer() {}
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ResourceManager resourceManager = new ClassPathResourceManager(ClassLoader.getSystemClassLoader(), "static");
         ResourceHandler resourceHandler = Handlers.resource(resourceManager);
         RoutingHandler routingHandler = new RoutingHandler();
