@@ -5,12 +5,15 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
+\usepackage{float}
 \usepackage{xcolor}
 \usepackage[ngerman]{babel}
 \usepackage{csquotes}
 \usepackage[parfill]{parskip}
 \usepackage[backend=bibtex, style=numeric]{biblatex}
 \addbibresource{thesis.bib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \raggedright
 
 \begin{document}
@@ -29,6 +32,8 @@
 \input{text/implementierung}
 \input{text/evaluation}
 \input{text/fazit}
+\appendix
+\input{text/appendix}
 \backmatter
 \printbibliography
 \end{document}

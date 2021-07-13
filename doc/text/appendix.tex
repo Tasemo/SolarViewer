@@ -1,0 +1,57 @@
+\chapter{Appendix}
+
+\section{Redundanzberechnung}\label{redundanzberechnung}
+\begin{algorithm}[H]
+\begin{algorithmic}
+\Procedure{findRedundancies}{data}
+    \State result, visited := boolean array with false values;
+    \ForAll{x, z \textbf{in} data}
+        \If{\textbf{not} visited[z][x]}
+            \State rowsWidth, rowsHeight := checkRows(data, x, z);
+            \State columnsWidth, columnsHeight := checkColumns(data, x, z);
+            \State width, height := Minimum of both widths and heights;
+            \If{width, height $>$ 3}
+                \ForAll{xx, zz \textbf{in} width, height}
+                    \If{\textbf{not} (0, 0 \textbf{or} 0, height \textbf{or} width, 0 \textbf{or} width, height)}
+                        \State result[z + zz][x + xx] := true
+                    \EndIf
+                    \State visited[z + zz][x + xx] := true
+                \EndFor             
+            \EndIf
+        \EndIf     
+    \EndFor
+    \State\Return result
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Der beschriebene Algorithmus iteriert über alle Werte in den übergebenen Daten und versucht an jeder Stelle das größtmögliche Raster zu finden, bei dem alle Spalten und Reihen eine lineare Abhängigkeit aufweisen. Die Anzahl und Länge der Reihen, sowie die Anzahl und Länge der Spalten, bei den dies hintereinander zutrifft wird also ermittelt und die kleinste Überschneidung in jeweils Breite und Höhe entsprechen den Dimensionen des umfassenden Rasters. Solange dieses Raster die Mindestbreite und -höhe von 3 erreicht hat, können alle Werte außer den Eckpunkten als redundant markiert werden. Zusätzlich können alle Punkte dieses Rasters als besucht markiert werden, damit zukünftige Iterationen dies nicht erneut berechnen müssen.
+
+\begin{algorithm}[H]
+\begin{algorithmic}
+\Procedure{checkRows}{data, currentX, currentZ}
+     \State width, height := 0
+     \For{z := currentZ \textbf{to} data.height}
+         \State difference := data[currentZ][currentX] - data[currentZ][currentX + 1];
+         \State rowSize := 2;
+         \For{x := currentX + 1 \textbf{to} data.width - 1}
+             \If{data[z][x] - data[z][x + 1] == difference}
+                 \If{width \textbf{not} 0 \textbf{and} width $<=$ rowSize}
+                     \State break;
+                 \EndIf
+                 \State rowSize := rowSize + 1;
+             \ElsIf{rowSize $<$ 3}
+                 \State\Return width, height;
+             \Else
+                 \State break;
+             \EndIf
+         \EndFor         
+         \State width := rowSize;
+         \State height := height + 1;
+     \EndFor
+     \State\Return width, height;
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Um die horizontalen linearen Abhängigkeiten zu finden muss vom aktuellen Punkt über alle verbliebenen Reihen iteriert werden. Die lineare Abhängigkeit kann geprüft werden, indem nacheinander die Differenzen der verbliebenen Werte in der Reihe verglichen werden. Solange diese gleich sind wird die Länge aktualisiert. Sollte bereits eine kürzere Länge gefunden worden sein, kann mit der nächsten Reihe weitergemacht werden. Sobald dies nicht mehr zutrifft und die aktuelle Länge kleiner als die Mindestlänge 3 ist, wird die aktuelle Reihe und die kürzeste Länge zurückgeliefert, ansonsten wird mit der nächsten Reihe weitergemacht. Der Algorithmus zum Bestimmen der Spalten ist equivalent und daher nicht aufgeführt.
