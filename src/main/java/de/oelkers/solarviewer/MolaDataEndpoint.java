@@ -31,11 +31,12 @@ public class MolaDataEndpoint implements HttpHandler {
     private static final short REPLACEMENT = Short.MIN_VALUE;
     private static final int PIXELS_WIDTH = 46080;
     private static final int PIXELS_HEIGHT = 23040;
+    private static final int CHUNK_SIZE = 2880;
 
     public MolaDataEndpoint() throws IOException {
         if (!Files.exists(Path.of(MARKED_DATA))) {
             short[][] data = load(ORIGINAL_DATA, 0, 0, PIXELS_WIDTH, PIXELS_HEIGHT, 1);
-            findRedundancies(data, REPLACEMENT);
+            findRedundancies(data, REPLACEMENT, CHUNK_SIZE);
             write(flatten(data));
         }
     }

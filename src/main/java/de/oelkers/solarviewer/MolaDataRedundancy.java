@@ -10,19 +10,23 @@ public final class MolaDataRedundancy {
     private MolaDataRedundancy() {}
 
     public static void findRedundancies(short[][] data, short replacement) {
+        findRedundancies(data, replacement, Integer.MAX_VALUE);
+    }
+
+    public static void findRedundancies(short[][] data, short replacement, int chunkSize) {
         boolean[][] visited = new boolean[data.length][data[0].length];
         for (int z = 0; z <= data.length - MIN_KERNEL_SIZE; z++) {
             for (int x = 0; x <= data[0].length - MIN_KERNEL_SIZE; x++) {
                 if (!visited[z][x]) {
-                    markRedundancies(data, replacement, visited, x, z);
+                    markRedundancies(data, replacement, visited, x, z, chunkSize);
                 }
             }
         }
     }
 
-    private static void markRedundancies(short[][] data, short replacement, boolean[][] visited, int currentX, int currentZ) {
-        List<Coordinates> rows = checkRows(data, currentX, currentZ);
-        List<Coordinates> columns = checkColumns(data, currentX, currentZ);
+    private static void markRedundancies(short[][] data, short replacement, boolean[][] visited, int currentX, int currentZ, int chunkSize) {
+        List<Coordinates> rows = checkRows(data, currentX, currentZ, chunkSize);
+        List<Coordinates> columns = checkColumns(data, currentX, currentZ, chunkSize);
         Coordinates maxArea = getRasterMaxArea(rows, columns);
         if (maxArea.x >= MIN_KERNEL_SIZE && maxArea.z >= MIN_KERNEL_SIZE) {
             for (int z = 0; z < maxArea.z; z++) {
@@ -52,14 +56,16 @@ public final class MolaDataRedundancy {
         return new Coordinates(maxX, maxZ);
     }
 
-    private static List<Coordinates> checkRows(short[][] data, int currentX, int currentZ) {
+    private static List<Coordinates> checkRows(short[][] data, int currentX, int currentZ, int chunkSize) {
+        int zLeft = currentZ + chunkSize - currentZ % chunkSize;
+        int xLeft = currentX + chunkSize - currentX % chunkSize;
         List<Coordinates> result = new ArrayList<>();
         Coordinates widthAndHeight = new Coordinates();
         result.add(widthAndHeight);
-        for (int z = currentZ; z < data.length; z++, widthAndHeight.z++) {
+        for (int z = currentZ; z < data.length && z < zLeft; z++, widthAndHeight.z++) {
             int difference = data[currentZ][currentX] - data[currentZ][currentX + 1];
             int currentRowSize = 2;
-            for (int x = currentX + 1; x < data[0].length - 1; x++) {
+            for (int x = currentX + 1; x < data[0].length - 1 && x < xLeft - 1; x++) {
                 if (data[z][x] - data[z][x + 1] == difference) {
                     if (widthAndHeight.x != 0 && widthAndHeight.x <= currentRowSize) {
                         break;
@@ -80,14 +86,16 @@ public final class MolaDataRedundancy {
         return result;
     }
 
-    private static List<Coordinates> checkColumns(short[][] data, int currentX, int currentZ) {
+    private static List<Coordinates> checkColumns(short[][] data, int currentX, int currentZ, int chunkSize) {
+        int xLeft = currentX + chunkSize - currentX % chunkSize;
+        int zLeft = currentZ + chunkSize - currentZ % chunkSize;
         List<Coordinates> result = new ArrayList<>();
         Coordinates widthAndHeight = new Coordinates();
         result.add(widthAndHeight);
-        for (int x = currentX; x < data[0].length; x++, widthAndHeight.x++) {
+        for (int x = currentX; x < data[0].length && x < xLeft; x++, widthAndHeight.x++) {
             int difference = data[currentZ][currentX] - data[currentZ + 1][currentX];
             int currentColumnSize = 2;
-            for (int z = currentZ + 1; z < data.length - 1; z++) {
+            for (int z = currentZ + 1; z < data.length - 1 && z < zLeft - 1; z++) {
                 if (data[z][x] - data[z + 1][x] == difference) {
                     if (widthAndHeight.z != 0 && widthAndHeight.z <= currentColumnSize) {
                         break;

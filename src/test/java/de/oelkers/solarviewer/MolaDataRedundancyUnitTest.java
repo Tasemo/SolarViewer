@@ -69,4 +69,28 @@ class MolaDataRedundancyUnitTest {
         findRedundancies(data, Short.MIN_VALUE);
         assertArrayEquals(expected, data);
     }
+
+    @Test
+    public void testFindRedundanciesWithChunkSize() {
+        short[][] data = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
+        short[][] expected = {{1, 2, 3, 4}, {1, Short.MIN_VALUE, 3, 4}, {1, 2, 3, 4}};
+        findRedundancies(data, Short.MIN_VALUE, 3);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    public void testFindRedundanciesWithChunkSizeNotAtStartHorizontal() {
+        short[][] data = {{42, 2, 3, 4}, {42, 2, 3, 4}, {42, 2, 3, 4}};
+        short[][] expected = {{42, 2, 3, 4}, {42, 2, Short.MIN_VALUE, 4}, {42, 2, 3, 4}};
+        findRedundancies(data, Short.MIN_VALUE, 4);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    public void testFindRedundanciesWithChunkSizeNotAtStartVertical() {
+        short[][] data = {{42, 42, 42}, {1, 2, 3}, {1, 2, 3}, {1, 2, 3}};
+        short[][] expected = {{42, 42, 42}, {1, 2, 3}, {1, Short.MIN_VALUE, 3}, {1, 2, 3}};
+        findRedundancies(data, Short.MIN_VALUE, 4);
+        assertArrayEquals(expected, data);
+    }
 }
