@@ -23,7 +23,7 @@ Die Datengrundlage für dieses Projekt sind Daten des Mars Orbiter Laser Altimet
 % Erklärung Kommunikation mit Shader (Attribut vs Uniform)
 % Koodinaten Systeme -> wie verlaufen die Achsen (positive x-Achse nach rechts, positive y-Achse nach oben und positive z-Achse in den Bildschirm hinein)
 
-\section{Datenreduzierung}
+\section{Datenreduzierung}\label{datenreduzierung}
 
 \subsection{Datenmenge}\label{datenmenge}
 Der beschriebene MOLA-Datensatz besitzt eine Breite von 46080 Pixeln und eine Höhe von 23040 Pixeln. Jeder Pixel ist dabei 16 bit groß, sodass die Rohdaten an sich eine Größe von 1,98 GB besitzen\cite{molaDataExtended}. Um daraus ein 3D-Modell zu erstellen, müssen neben den Höhenwerten natürlich auch die x- und z-Position erfasst werden, welche sich aus dem Rasterformat der Daten errechnen lassen. Erschwerend hinzu kommt, dass der kleinste numerische Datentyp in GLSL 32 bit groß ist\cite[Abschnitt 4.1, S. 23]{glslSpec} und sich die Höhendaten so nicht effizient speichern lassen. Eine entsprechende Erweiterung (\textit{extension}) von GLSL um 16 bit Typen mit dem Namen EXT\_shader\_16bit\_storage existiert, befindet sich allerdings erst in der Entwurfsphase und kann daher nicht genutzt werden. Die reinen Vertex-Daten besitzen also eine Größe von 11,88 GB. Weitere Daten pro Vertex (zum Beispiel Normalenvektoren) werden für dieses Projekt nicht benötigt. Allerdings können diese Vertex-Daten in dieser Form nicht an OpenGL übergeben werden, da erst Polygone (OpenGL Primitives) daraus erstellt werden müssen. Im einfachsten Fall sind dies für ein Rastermodell natürlich Vierecke (GL\_QUAD), diese Form ist allerdings veraltet und sollten nicht mehr benutzt werden. Stattdessen müssen die Vertex-Daten  Dreiecke (GL\_TRIANGLE) beschreiben. Da in einem Rastermodell aus Dreiecken natürlich ein Vertex 6 mal wiederholt werden müsste, gibt es eine effizientere Beschreibung der Polygone: Indexierung. Dabei wird ein Array an OpenGL übergeben, welche die Reihenfolge der Vertices als deren Position im ursprünglichen Vertex-Array kodiert (siehe Abbildung \ref{indexing}). 
@@ -42,11 +42,19 @@ Die einfachste Möglichkeit, ist die Entfernung von Redundanzen. Diese können a
 
 Eine andere Möglichkeit eine verlustfreie Reduktion zu erreichen, ist die Daten zu entfernen, die vom Benutzer nicht gesehen werden können. Das betrifft explizit nicht den Punkt, dass Unterschiede auf Grund der Physiologie des menschlichen Auges nicht wahrgenommen werden können, da dies trotzdem einem theoretischen Informationsverlust entspricht.
 
+% frustum culling, also das Entfernen von Daten außerhalb des Sichtbereichs der Kamera (Frustum).
+% collucion culling, also das Entfernen von Daten, die durch andere Daten verdeckt werden
+% dies ist nach der Projektion auf eine Kugel der Fall, wenn die Daten am anderen Ende des Globus liegen
+% Vorraussetzung: Unteilung des ganzen Modells in kleinere Abschnitte (chunks), für jeden Abschnitt muss geprüft werden, ob er durch eine der beiden Methoden ausgeschlossen werden kann
+% solange auch nur ein Teil des Abschnitts sichbar ist, muss der ganze Abschnitt angezeigt werden
+
 \subsection{Verlustbehaftet}
 Das Durchführen von verlustfreien Methoden allein reicht nicht aus, um den Speicherverbrauch auf ein akzeptables Niveau zu senken.
 
 % systematische reduktion, mit fester Schritteite (stride) über die Daten iterieren -> Vorteil: die Indexierung bleibt erhalten nur die Abstände vergößern sich
-% geringe Änderungen in einem 3D Kontekt, auch oft als geringe räumliche Frequenz beschrieben, 
+% hier ausnutzen, dass zum Beispiel bei geringen Zoomstufen Unterschiede in den Daten nicht mehr wahrgenommen werden können (physiologie)
+% geringe Änderungen in einem 3D Kontekt, auch oft als geringe räumliche Frequenz beschrieben, entfernen
+% Reduktion der Datenmenge abhängig vom umliegenden Terrain -> ähnliche vertices müssen nicht wiederholt werden,
 
 \subsection{Redundanzentfernung}\label{redundanzberechnung}
 Bevor ein geeigneter Algorithmus gefunden werden kann, müssen einige Probleme mit der Entfernung von Redundanzen besprochen werden. Zum einen besteht das Problem, die gefundenen Lücken in einem Datenformat darzustellen. Normalerweise besteht immer der gleiche Abstand zwischen zwei benachbarten Datenpunkte, wenn jetzt einfach Vertices entfernt werden, dann ändern sich die Abstände und dies muss irgendwie kodiert werden. Eine Möglichkeit dies zu umgehen, ist die Entfernung zur Laufzeit durchzuführen und direkt bei der Erstellung redundante Vertices zu erkennen. Da der hier verwendete Algorithmus allerdings sehr kostenaufwendig ist, wurde dieser Ansatz verworfen. Stattdessen werden die Lücken durch vordefinierte Werte kodiert, die nicht in den originalen Daten vorhanden sind. Im konkreten Fall wurde der kleinstmögliche 16bit Wert gewählt.
@@ -55,70 +63,45 @@ Zum anderen besteht das Problem der Indexierung des Modells. In einem reinen Ras
 
 Wie beschrieben, ist die Unterteilung des Gesamtmodells in Abschnitte ein zentraler Aspekt der Anwendung um das \textit{frustum-} und \textit{occlusion culling} durchführen zu können. Die führt aber zu einer weiteren Einschränkung bei der Entfernung von Redundanzen, die über Abschnittsgrenzen hinaus gehen würden. Die müssen an den Rändern der Abschnitte definiert sein, um sich mit benachbarten Abschnitten verbinden zu können. Auch sollen per Design Abschnitte keinen Zugriff auf Vertex-Daten anderer Abschnitte erhalten (schon allein um Daten nicht unnötig im RAM zu halten). Dies führt dazu, dass der Algorithmus zusätzlich redundante Teilraster an den Abschnittsgrenzen trennen muss. Dies verringert den Prozentsatz allerdings nur minimal auf 1,86\%.
 
-Nachdem nun Anforderungen an den Algorithmus definiert wurden, muss das Problem der hohen Komplexität angegangen werden. Die optimale Lösung ist durch die größtmögliche Entfernung von Vertices definiert, was auch durch eine möglichst große Summe des Flächeninhalts aller Teilraster beschrieben werden kann. Das Problem ist, dass während der Laufzeit nicht sichtbar ist, welche Konfiguration der Raster zur größtmöglichen Fläche führt. Es kann durchaus sein, dass in einem Teilschritt ein kleineres Raster gebildet werden muss, damit übrig gebliebene Vertices Teil eines deutlich größeren Rasters werden. Das diesem Problem am nächsten stehende bekannte Problem aus der Informatik ist das Problem des \textit{rectangle packing}, einer 2D Variation des Rucksack-Problems, welches der Komplexitätsklasse NP-Vollständig zugerechnet wird. Die Überprüfung ob eine Lösung optimal ist, erfordert dabei das Überprüfen aller anderen Lösungen, was eine exponentielle Zeit benötigt. Allerdings sind im konkreten Fall einige Einschränkungen vorhanden, die die Komplexität verringern. Zum einen können die Rechtecke nicht an jede Stelle gepackt werden, sondern nur in den Flächen, die als Redundanzen in Frage kommen. Zum anderen ist die Mindestgröße eines Rechtecks 3x3, sodass sich die Anzahl der Möglichkeiten um den Faktor 9 verringert. Unter der Annahme, dass die aktuelle, nicht optimale Berechnung die Anzahl der Gesamtredundanzen mit ungefähr 2\% widerspiegelt, ist die Komplexität: \[O(n) = O(1.061.683.200) = 2^n / 9 * 2 / 100 = 2.75 * 10^{319.598.486}\].
-
-Als machbare Alternative wurde hier ein Algorithmus aus der Klasse der greedy Algorithmen gewählt. Dabei wird in jedem Teilschritt des Algorithmus immer die aktuell beste Lösung, also das größte Teilraster, gewählt. Die gefundene Lösung ist damit zwar nicht unbedingt optimal, aber es wird ein lokales Minimum erreicht. Der größte Vorteil dabei ist, das die Lösung in linearer Komplexität gefunden werden kann.
-
-
-
-
-
-
-
-
-
-
-
-
+Nachdem nun Anforderungen an den Algorithmus definiert wurden, muss das Problem der hohen Komplexität angegangen werden. Die optimale Lösung ist durch die größtmögliche Entfernung von Vertices definiert, was auch durch eine möglichst große Summe des Flächeninhalts aller Teilraster beschrieben werden kann. Das Problem ist, dass während der Laufzeit nicht sichtbar ist, welche Konfiguration der Raster zur größtmöglichen Fläche führt. Es kann durchaus sein, dass in einem Teilschritt ein kleineres Raster gebildet werden muss, damit übrig gebliebene Vertices Teil eines deutlich größeren Rasters werden. Das diesem Problem am nächsten stehende bekannte Problem aus der Informatik ist das Problem des \textit{rectangle packing}, einer 2D Variation des Rucksack-Problems, welches der Komplexitätsklasse NP-Vollständig zugerechnet wird. Die Überprüfung ob eine Lösung optimal ist, erfordert dabei das Überprüfen aller anderen Lösungen, was eine exponentielle Zeit benötigt. Allerdings sind im konkreten Fall einige Einschränkungen vorhanden, die die Komplexität verringern. Zum einen können die Rechtecke nicht an jede Stelle gepackt werden, sondern nur in den Flächen, die als Redundanzen in Frage kommen. Zum anderen ist die Mindestgröße eines Rechtecks 3x3, sodass sich die Anzahl der Möglichkeiten um den Faktor 9 verringert. Unter der Annahme, dass die aktuelle, nicht optimale Berechnung die Anzahl der Gesamtredundanzen mit ungefähr 2\% widerspiegelt, ist die Komplexität: \[O(n) = O(1.061.683.200) = 2^{n / 9 * 2 / 100} = 7.32 * 10^{710.218}\].
+´
+Als machbare Alternative wurde hier ein Algorithmus aus der Klasse der greedy Algorithmen gewählt. Dabei wird in jedem Teilschritt des Algorithmus immer die aktuell beste Lösung, also das größte Teilraster, gewählt. Die gefundene Lösung ist damit zwar nicht unbedingt optimal, aber es wird ein lokales Minimum erreicht. Der größte Vorteil dabei ist, das die Lösung mit fast linearer Komplexität gefunden werden kann. Die Komplexität ist leicht erhöht, da pro Wert immer eine nicht bestimmbare Anzahl an nachfolgenden Werten überprüft werden muss. Diese können aber potentiell bei nachfolgenden Iterationen übersprungen werden, falls sie als redundant eingestuft wurden. Der Algorithmus (siehe Algorithmus \ref{redundanz_algorithmus}) iteriert über alle Werte und sucht für jeden nicht besuchten Datenpunkt alle nachfolgenden horizontalen und vertikalen linearen Abhängigkeiten. Dabei werden jeweils die Breiten und Längen dieser Abhängigkeiten zurückgeliefert und auch alle Alternativen in Betracht gezogen. Es können zum Beispiel bei den Reihen jeweils 3 Reihen eine Breitenlänge von 4 haben oder 5 Reihen eine Breitenlänge von 3. Beides kann zum größtmöglichen Raster führen. Dies wird auch für die Spalten durchgeführt und die größtmögliche Überschneidung aus Spalten und Reihen wird als redundant markiert, solange sie die Mindestgröße von 3x3 erreicht hat.
 
 \begin{algorithm}[H]
 \begin{algorithmic}
-\Procedure{findRedundancies}{data}
-    \State result, visited := boolean array with false values;
+\caption{Redundanzentfernung}
+\label{redundanz_algorithmus}
+\Procedure{findRedundancies}{data, replacement, chunkSize}
     \ForAll{x, z \textbf{in} data}
-        \If{\textbf{not} visited[z][x]}
-            \State rowsWidth, rowsHeight := checkRows(data, x, z);
-            \State columnsWidth, columnsHeight := checkColumns(data, x, z);
-            \State width, height := Minimum of both widths and heights;
-            \If{width, height $>$ 3}
-                \ForAll{xx, zz \textbf{in} width, height}
-                    \If{\textbf{not} (0, 0 \textbf{or} 0, height \textbf{or} width, 0 \textbf{or} width, height)}
-                        \State result[z + zz][x + xx] := true
-                    \EndIf
-                    \State visited[z + zz][x + xx] := true
-                \EndFor             
+        \If{Wert an Stelle x, z noch nicht besucht}
+            \State rows = Finde alle Abhängigkeiten in den Reihen ab x, z (checkRows)
+            \State columns = Finde alle Abhängigkeiten in der Spalten ab x, z
+            \State raster = Finde das Raster mit dem größten Flächeninhalt in rows, columns
+            \If{raster hat Mindestgröße 3x3}
+                \State Ersetze alle Werte in raster, die nicht Kanten sind, mit replacement
+                \State Markiere alle Werte in raster als besucht
             \EndIf
         \EndIf     
     \EndFor
-    \State\Return result
+\EndProcedure
+\Procedure{checkRows}{data, currentX, currentZ, chunkSize}
+    \ForAll{z von currentZ bis Ende der Reihen oder Ende des Chunks}
+        \State difference = data[z][x] - data[z][x + 1]
+        \ForAll{x von currentX bis Ende der Spalte oder Ende des Chunks}
+            \If{nächste Differenz == difference}
+                \State Inkrementiere aktuelle Breite
+            \ElsIf{aktuelle Breite $<$ 3}
+                \State\Return alle Breitenlängen und deren Reihen
+            \ElsIf{aktuelle Breite $<$ letzte Breite}
+                \State Speichere Breitenlänge und Reihe
+                \State letzte Breite = aktuelle Breite
+                \State Weiter mit nächster Reihe
+            \Else
+                \State Weiter mit nächster Reihe
+            \EndIf
+        \EndFor
+    \EndFor
+    \State\Return alle Breitenlängen und deren Reihen
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-
-
-
-
-% Abschnitt, der erstmal die vollständige Datengröße beschreibt
-% außerdem ist es ein Rasterformat, also feste Abstände zwischen einzelnen Datenpunkten
-
-% verlustfrei: alles was nicht im Sichtbereich der Kamera liegt (Frustum Culling) und alles, was durch andere Dinge verdeckt wird (Occlusion Culling) -> andere Seite des Globus
-% dazu Unterteilung der Welt in Abschnitte (chunks) und nur Anzeigen der Abschnitte, welche den Sichtbreich auch nur ansatzweise schneiden und nicht vollständig durch andere Abschnitte verdeckt sind
-% verlustbehaftet: 
-% hier ausnutzen, dass zum Beispiel bei geringen Zoomstufen Unterschiede in den Daten nicht mehr wahrgenommen werden können
-% Außerdem: Entfernung von Redundanzen -> da Rasterformat , hier ist es abhängig von der Komplexität des Terrains,
-
-% Redukttion der Datenmenge in festgelegten Schritten (stride), systemetaische Reduktion
-% Reduktion der Datenmenge abhängig vom umliegenden Terrain -> ähnliche vertices müssen nicht wiederholt werden,
-% gerade bei natürlichen Daten gibt es sehr ähnliche Pubkt
-
-% eine Plane besteht zwar auf 4 Eckpunkten, allerdings muss sie in OpenGL Primitives zerlegt werden -> dies sind normalerweise Dreiecke
-% es existieren auch Quad-Primitives, diese sind jedoch veraltet und sollten nicht mehr benutzt werden
-
-% also 6 Eckpunkte, da ja jeder Eckpunk auch Teil des benachbartenn PLane ist, wird insgesamt ein Eckpunkt 6 mal wiederholt (siehe kleine Grafik) -> also wird bei der Erzeugung des Modell eine Indexierung vorgenommen, einfach eine Liste mit Indexen die eine die Liste mit den Vertex-Daten referenziert ->
-
-% bei der systematischen Reduktion ist das kein Problem, die Indixierung des Raster Modells bleibt erhalten, nur die Abstände zwischen den Vertices erhöhen sich
-
-% erwähne die Formel um aus einem 1D Array ein 2D Array zu erstellen
-
-% bei der asymetrischen Reduktion kann nicht mehr aus dem 1D Vertex-Format auf eine Indexierung geschlossen werden, also muss hier ein 2D Format gesendet werden was die entfernen
-% Vertex-Daten kennzeichnet

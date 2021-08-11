@@ -14,6 +14,8 @@
 \addbibresource{thesis.bib}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\renewcommand{\listalgorithmname}{Liste der Algorithmen}
+\floatname{algorithm}{Algorithmus}
 \raggedright
 
 \begin{document}
@@ -23,6 +25,7 @@
 \input{text/kurzbeschreibung}
 \tableofcontents
 \listoffigures
+\listofalgorithms
 \mainmatter
 \input{text/einfuehrung}
 \input{text/grundlagen}
@@ -32,8 +35,6 @@
 \input{text/implementierung}
 \input{text/evaluation}
 \input{text/fazit}
-\appendix
-\input{text/appendix}
 \backmatter
 \printbibliography
 \end{document}

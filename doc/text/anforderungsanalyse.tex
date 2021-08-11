@@ -1,13 +1,31 @@
 \chapter{Anforderungsanalyse}
 
 \section{Use Case}
-Die Zielgruppe dieses Projekts lässt sich relativ schwer eingrenzen. Es betrifft vor allem Personen mit Interesse in Raumfahrt oder dem Weltraum allgemein. Wichtig ist, das diese Personen keinen Bezug zur Informatik aufweisen müssen und zum Beispiel die Bedienung des User Interface daher kein Spezialwissen erfordern darf. Auch die Visualisierung der Oberfläche muss ohne Vorkenntnisse verständlich sein und dabei trotzdem noch die eigentliche Oberfläche korrekt repräsentieren.
+Die Zielgruppe dieses Projekts lässt sich relativ schwer eingrenzen. Es betrifft vor allem Personen mit Interesse in Raumfahrt oder dem Weltraum allgemein. Wichtig ist, das diese Personen keinen Bezug zur Informatik aufweisen müssen und zum Beispiel die Bedienung des User Interface daher kein Spezialwissen erfordern darf. Auch die Visualisierung der Oberfläche muss ohne Vorkenntnisse verständlich sein und dabei trotzdem noch die eigentliche Oberfläche korrekt und realitätsnah repräsentieren.
 
 \section{Ist-Zustand}
 % Existieren andere ähnliche Visualisierungen
 
 \section{Anforderungen}
-% funktionale und nicht-funktionale Anforderungen
-% muss und kann (fakultative) anforderungen
+Auf Grund des Prototypen-Charakters dieses Projekts besteht eine geringere Priorisierung bei den funktionalen und nicht-funktionalen Anforderungen. Es sollen möglichst viele verschiedenen Möglichkeiten zur Datenreduzierung (siehe Abschnitt \ref{datenreduzierung} implementiert und evaluiert werden. Die Anwendung soll dennoch einen Nutzen erfüllen um die Evaluation so realistisch wie möglich zu gestalten. Auch hilft dies dabei, die Korrektheit der Implementierungen zu verifizieren, wenn eine vollständige Visualisierung mit verschiedenen Features vorhanden ist. Um die konkreten Anforderungen zu ermitteln, wurden diverse Personen aus der Zielgruppe nach ihren Wünschen befragt. Aus diesen Wünschen wurden die Features priorisiert, die von den meisten Personen gewünscht wurden. Bestimmte Features, welcher im gegebenem Projektzeitraum nicht umsetzbar waren, wurden dabei im voraus verworfen. 
 
-% möglichst realitische Darstellung des Mars mit den beschriebenen Daten, in so großer Auflösung wie, unter Einbeziehung der Performancekriterien, nur möglich
+
+\subsection{Funktional}
+Die wichtigste funktionale Anforderung ist die eine realistische Darstellung des Mars mit den beschriebenen Daten. Dabei soll eine reine 3D Darstellung gewählt werden, 
+
+
+
+\subsection{Nicht-Funktional}
+Die nicht-funktionalen Anforderungen richten sich hauptsächlich an die Qualität der Visualisierung und die Performance. Hier ist es schwer, die formulierten Wünsche in konkrete Anforderungen umzuwandeln, da hier oft subjektive Dinge eine Rolle spielen. Auch lassen sich bestimmte Dinge wie die Performance einfach nicht in der gewünschten Qualität (z.B. in der Form x Frames Per Second (FPS) auf Hardware y) definieren. Insbesondere die Hardwareanforderungen können dabei nicht genau definiert werden. Eine Kernaussage ist, dass die Anwendung möglichst immer die höchste Datenauflösung anzeigt, die möglich ist. Wie bereits beschrieben (siehe Abschnitt \ref{datenmenge}) ist ein dauerhaftes Anzeigen der höchstmöglichen Datenauflösung auf normaler Hardware einfach nicht umsetzbar. Daher soll die Auflösung immer genau so hoch gewählt werden, dass eine dauerhafte Framerate von ungefähr 30 FPS erreicht wird. Die Framerate sollte möglichst genau getroffen werden, eine Abweichung darunter schadet der User Experience (UX), eine Abweichung darüber erlaubt eine Verbesserung der Datenauflösung. Hier ist also ein sehr starkes Ringen zwischen Performance und Qualität vorhanden. Der Wert wurde, anstatt der üblichen 60 FPS, nur auf ungefähr 30 FPS festgelegt, da die Visualisierung keine starken Bewegungen und somit keine flüssigen Übergange benötigt. Der Nutzer soll zwar die Kamera bewegen können, allerdings liegt der Fokus dabei immer noch auf der Visualisierung an sich.
+
+Ein weiterer Aspekt ist, dass keine dedizierten Ladezeiten vorhanden sein sollen, in denen die Visualisierung nicht zu sehen ist. Dies wird häufig genutzt, um visuelle Ladeartefakte zu verstecken. Diese können zum Beispiel auftreten, wenn neue Abschnitte geladen werden müssen, nachdem der Benutzer die Kamerasicht verändert hat. Idealerweise soll auch auch ohne Ladezeiten der Nutzer nichts von der Trennung in Abschnitte mitbekommen und immer den Mars als Ganzes sehen. Dies kann zum Beispiel erreicht werden, in dem die Bewegung der Kamera antizipiert wird und Abschnitte, welche als nächstes geladen werden müssten, bereits vorgeladen werden. 
+
+Wichtig ist, dass die bisherigen nicht-funktionalen Anforderungen immer abhängig von der Hardware des Nutzer ist, da die Visualisierung auf Client-Seite durchgeführt wird. 
+
+% Paramaetr könnten auch vorher von Hand an bestimmte Performanceklassen angepasst werden
+ Es müsste also idealerweise einen Mechanismus geben, der zur Laufzeit bestimmte Parameter an die aktuellen Hardware anpasst
+
+% wichtig ist, das die bisherigen Anforderungen eher fakultativ sind, da ein Finetuning aller Parameter für unterschiedliche Hardware den Projektrahmen sprengen würde, hier wurden die idealen Anforderungen beschrieben, in der Praxis sollten diese nur ungefähre Richtwerte darstellen
+
+% die Anforderungen an Arbeits- (RAM) und Grafikkartenspeicher (VRAM) sollen denen eines Mittelklasselaptops nicht überschreiten, hier wurde sich auf eine obere Grenze von 8 GB RAM und 4 GB VRAM geeignigt. diese Grenzen sind, anders als die vorigen Anforderungen, absolut kritisch und dürfen nicht überschritten werden
+% der Grund dafür ist, dass eine absolute Kernanforderung die unbegrenzte Skalierbarkeit ist, die Anwendung soll für dieses Projekt zwar nur mit MOLA Daten funktionieren, aber eine Erweiterung auf anderen Datensätze bietet sich an und sollte nicht verhindert werden

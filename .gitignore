@@ -15,4 +15,5 @@ resources
 *.run.xml
 *.gz
 *.toc
+*.loa
 *-blx.bib

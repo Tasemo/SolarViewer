@@ -49,7 +49,7 @@ public class MolaDataEndpoint implements HttpHandler {
         int width = Integer.parseInt(params.get("width").getFirst());
         int height = Integer.parseInt(params.get("height").getFirst());
         int stride = params.get("stride") == null ? 1 : Integer.parseInt(params.get("stride").getFirst());
-        short[][] data = load(MARKED_DATA, x, z, width, height, stride);
+        short[][] data = load(ORIGINAL_DATA, x, z, width, height, stride);
         exchange.getResponseSender().send(Arrays.toString(flatten(data)));
     }
 
