@@ -2,9 +2,6 @@ import * as THREE from "three";
 import { Constants } from "./constants";
 import { Projection } from './projections';
 
-const SHORT_MIN_VALUE = -32768;
-const UNSIGNED_SHORT_MAX_VALUE = 65535;
-
 export default class ModelLoader {
 
     private baseUrl: string;
@@ -22,7 +19,7 @@ export default class ModelLoader {
     /**
      * Loads the elevation data at the specified position with the specified size in pixel space from the server
      * and constructs a three dimensional indexed grid model.
-     * 
+     *
      * @param xPixel the x position in pixel space
      * @param zPixel the z position in pixel space
      * @param width the width in pixel space
@@ -30,7 +27,7 @@ export default class ModelLoader {
      */
     async load(xPixel: number, zPixel: number, width: number, height: number, stride: number): Promise<THREE.BufferGeometry> {
         const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${stride}&width=${width}&height=${height}`;
-        const elevationData: number[] = await (await fetch(url)).json();
+        const elevationData: number[] = await (await fetch(url)).json()
         const vertices = new Float32Array(3 * elevationData.length);
         const dataWidth = width / stride;
         const dataHeight = height / stride;
@@ -39,40 +36,26 @@ export default class ModelLoader {
             const z = (Math.floor(i / dataWidth) * stride + zPixel) * this.meterPerPixel;
             this.projected(new THREE.Vector3(x, elevationData[i], z), vertices, i * 3);
         }
-        const indices = []; // unable to use a typed array since the size is not known
+        const indexLength = 6 * (dataWidth - 1) * (dataHeight - 1);
+        const indices = vertices.length > 65535 ? new Uint32Array(indexLength) : new Uint16Array(indexLength);
         for (let z = 0; z < dataHeight - 1; z++) {
             for (let x = 0; x < dataWidth - 1; x++) {
                 const topLeft = z * dataWidth + x;
-                let topRight = topLeft + 1;
-                let bottomLeft = (z + 1) * dataWidth + x;
+                const topRight = topLeft + 1;
+                const bottomLeft = (z + 1) * dataWidth + x;
                 const bottomRight = bottomLeft + 1;
-                if (elevationData[topLeft] === SHORT_MIN_VALUE || elevationData[bottomLeft] === SHORT_MIN_VALUE || elevationData[topRight] === SHORT_MIN_VALUE) {
-                    continue;
-                }
-                for (let i = 0, bottomRightPointer = bottomRight; i < dataWidth - 2 && elevationData[bottomRightPointer] === SHORT_MIN_VALUE; i++) {
-                    topRight++;
-                    bottomRightPointer = bottomLeft + topRight;
-                }
-                for (let i = 0, bottomRightPointer = bottomRight; i < dataWidth - 1 && elevationData[bottomRightPointer] === SHORT_MIN_VALUE; i++) {
-                    bottomLeft = (z + 1 + i) * dataWidth + x;
-                    bottomRightPointer = bottomLeft + 1;
-                }
-                indices.push(topLeft);
-                indices.push(bottomLeft);
-                indices.push(topRight);
-                indices.push(topRight);
-                indices.push(bottomLeft);
-                indices.push(bottomLeft + topRight);
+                const index = 6 * (z * (dataWidth - 1) + x);
+                indices[index] = topLeft;
+                indices[index + 1] = bottomLeft;
+                indices[index + 2] = topRight;
+                indices[index + 3] = topRight;
+                indices[index + 4] = bottomLeft;
+                indices[index + 5] = bottomRight;
             }
         }
-        // remove the marked vertices after the correct indices were computed
-        const finalVertices: Float32Array = vertices.filter((_, index) => {
-            return elevationData[Math.floor(index / 3)] !== SHORT_MIN_VALUE;
-        });
-        const finalIndices = vertices.length > UNSIGNED_SHORT_MAX_VALUE ? new Uint32Array(indices) : new Uint16Array(indices);
         const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute("position", new THREE.BufferAttribute(finalVertices, 3));
-        geometry.setIndex(new THREE.BufferAttribute(finalIndices, 1));
+        geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
         return geometry;
     }
 
