@@ -3,14 +3,18 @@ import { Constants } from "../constants";
 import Throttle from '../throttle';
 import CameraController from './cameraController';
 
+/**
+ * A camera controller that allows changing the cameras orientation by dragging the mouse and
+ * allows for moving along the orientation with keyboard input (arrow keys and WASD).
+ */
 export default class FreeFlyCamera implements CameraController {
 
     private readonly changeEvent = { type: "viewChange" };
 
-    enabled = true;
-    private camera: THREE.Camera;
-    private movement = new THREE.Vector3();
-    private eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
+    public enabled = true;
+    private readonly camera: THREE.Camera;
+    private readonly movement = new THREE.Vector3();
+    private readonly eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
     private dragging = false;
 
     constructor(camera: THREE.Camera) {
@@ -22,7 +26,7 @@ export default class FreeFlyCamera implements CameraController {
         window.addEventListener("mousemove", this.onMouseMove.bind(this));
     }
 
-    update(frameTimeSeconds: number) {
+    public update(frameTimeSeconds: number) {
         if (this.movement.lengthSq() !== 0) {
             const scaled = this.movement.clone();
             scaled.multiplyScalar(frameTimeSeconds);

@@ -1,10 +1,14 @@
 import { Constants } from "../constants";
 
+/**
+ * A slider element extends any element to be able to slide in and out smoothly at a duration specified by {@link Constants.SLIDER_SPEED}.
+ * The element has to allow for absolute positioning.
+ */
 export default abstract class SliderElement {
 
-    private element: HTMLElement;
+    private readonly element: HTMLElement;
     private scrollOffset: number;
-    private interval: number;
+    private readonly interval: number;
     private active = false;
 
     constructor(element: HTMLElement) {

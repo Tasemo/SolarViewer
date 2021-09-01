@@ -5,22 +5,22 @@ import { Projections } from './projections';
 
 class ChunkEntry {
 
-    isLoading = true;
-    mesh: THREE.Mesh | undefined;
-    stride: number | undefined;
+    public isLoading = true;
+    public mesh: THREE.Mesh | undefined;
+    public stride: number | undefined;
 }
 
 export default class WorldController {
 
-    private chunks: Array<Array<ChunkEntry | null>> = [[]];
-    private chunkBounds: Array<Array<THREE.Mesh>> = [[]];
-    private chunkBounds1D: Array<THREE.Mesh> = [];
-    camera: THREE.Camera;
-    scene: THREE.Scene;
-    private material: THREE.Material;
-    modelLoader: ModelLoader;
-    private frustum = new THREE.Frustum();
-    private raycaster = new THREE.Raycaster();
+    private readonly chunks: Array<Array<ChunkEntry | null>> = [[]];
+    private readonly chunkBounds: Array<Array<THREE.Mesh>> = [[]];
+    private readonly chunkBounds1D: Array<THREE.Mesh> = [];
+    public readonly camera: THREE.Camera;
+    public readonly scene: THREE.Scene;
+    private readonly material: THREE.Material;
+    public readonly modelLoader: ModelLoader;
+    private readonly frustum = new THREE.Frustum();
+    private readonly raycaster = new THREE.Raycaster();
 
     constructor(camera: THREE.Camera, scene: THREE.Scene, material: THREE.Material, modelLoader: ModelLoader) {
         this.camera = camera;
@@ -31,7 +31,7 @@ export default class WorldController {
         camera.addEventListener("viewChange", this.onViewChange.bind(this, false));
     }
 
-    reload() {
+    public reload() {
         this.generateChunkBounds();
         this.onViewChange(true);
     }
@@ -118,7 +118,7 @@ export default class WorldController {
     }
 
     /**
-     * Loads the chunk at the specified position in chunk space and requests additional pixels
+     * Loads the chunk at the specified position in chunk space with the given stride and requests additional pixels
      * to connect neighboring chunks.
      * 
      * @param x the x position in chunk space

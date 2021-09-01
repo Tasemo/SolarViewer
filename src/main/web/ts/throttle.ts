@@ -1,3 +1,7 @@
+/**
+ * A throttle limits the amount of times a given delegate function is called. It is ensured, that
+ * the delegate is called after the timeout even if the throttle is never invoked again.
+ */
 export default class Throttle {
 
     private func: Function;
@@ -10,7 +14,7 @@ export default class Throttle {
         this.limitMs = limitMs;
     }
 
-    apply(...args: any[]) {
+    public apply(...args: any[]) {
         window.clearTimeout(this.lastTimeout);
         this.lastTimeout = window.setTimeout((() => {
             this.func.apply(args);

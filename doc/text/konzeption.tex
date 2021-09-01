@@ -62,20 +62,20 @@ Die Architektur der Anwendung gliedert sich in das Frontend und das Backend. Vor
 
 Ein weiterer Kernaspekt der Architektur ist die Unterteilung der Welt in Abschnitte, im folgenden auch oft als chunks bezeichnet. Dies ist bedingt durch die große Datenmenge, welches ein vollständiges Laden in den Arbeits-/Grafikspeicher nicht möglich macht (siehe TODO). Es wurde sich für die Nutzung von chunks in festen Größen, im konkreten TODO, entschieden, da es 
 
-In Abbildung 1 ist ein Aktivitätsdiagramm dargestellt, welches den geplanten Ablauf der Welterstellung auf Client-Seite grob darstellt. Die Aktivität wird durch jede Veränderung der Kamera durch den Benutzer gestartet. Dazu zählt die Translation durch die Benutzung der Pfeiltasten, die Rotation durch die Benutzung der Maus und die Skalierung oder Zoom durch die Benutzung des Mausrads. Als erstes wird eine Liste mit allen möglichen chunks berechnet, welche den Sichtbereich der Kamera (Frustum) auch nur ansatzweise schneiden. Diese Liste wird verglichen mit einer Liste aller aktuellen chunks, um neue und nicht mehr benötigte Abschnitte zu ermitteln. Die rohen Höhendaten des Abschnitt werden vom Server angefragt. Da dies noch keine Interaktion mit OpenGL benötigt und potentiell mehrere Abschnitte angefragt und transformiert werden müssen, habe ich hier eine erste Parallelisierung, durch die Nutzung von Web Worker, geplant. Als nächstes müssen die Höhendaten in dreidimensionale Koordinaten auf einer Kugel transformiert werden. Die Formel dafür lautet TODO. Abschnitte, welche aktuell vorhanden sind, aber nicht mehr sichtbar sind, müssen vollständig entladen werden. Hierbei ist darauf zu achten, auch die Ressourcen auf GPU Seite frei zu stellen, da dies natürlich nicht durch die automatische garbage collection auf JavaScript Seite abgedeckt ist. 
+In Abbildung 1 ist ein Aktivitätsdiagramm dargestellt, welches den geplanten Ablauf der Welterstellung auf Client-Seite grob darstellt. Die Aktivität wird durch jede Veränderung der Kamera durch den Benutzer gestartet. Dazu zählt die Translation durch die Benutzung der Pfeiltasten, die Rotation durch die Benutzung der Maus und die Skalierung oder Zoom durch die Benutzung des Mausrads. Als erstes wird eine Liste mit allen möglichen chunks berechnet, welche den Sichtbereich der Kamera (Frustum) auch nur ansatzweise schneiden. Diese Liste wird verglichen mit einer Liste aller aktuellen chunks, um neue und nicht mehr benötigte Abschnitte zu ermitteln. Die rohen Höhendaten des Abschnitt werden vom Server angefragt. Da dies noch keine Interaktion mit OpenGL benötigt und potentiell mehrere Abschnitte angefragt und transformiert werden müssen, wird hier eine erste Parallelisierung, durch die Nutzung von Web Worker, geplant. Als nächstes müssen die Höhendaten in dreidimensionale Koordinaten auf einer Kugel transformiert werden. Die Formel dafür lautet TODO. Abschnitte, welche aktuell vorhanden sind, aber nicht mehr sichtbar sind, müssen vollständig entladen werden. Hierbei ist darauf zu achten, auch die Ressourcen auf GPU Seite frei zu stellen, da dies natürlich nicht durch die automatische garbage collection auf JavaScript Seite abgedeckt ist. 
 
 Ein weiteres Problem, was durch die Benutzung von chunks auftritt, ist das TODO [inklusive Bild von nicht verbundenen chunks]
 
-
-Chunks, welche aktuell vorhanden sind, aber nicht mehr in der Liste der sichtbaren chunks, müssen 
-
+% Insert Komponentendiagramm und/oder Klassendiagramm
 
 \section{User Interface}
-% Insert Mock Up
-% Hauptkriterium: Visualisierung soll nicht durch unnötige Informationen gestört werden, User soll selbst entscheiden, was er angezeigt haben möchte
+% Insert Mock Up, 
+% kleine UI, Hauptkriterium: Visualisierung soll nicht durch unnötige Informationen gestört werden, User soll selbst entscheiden, was er angezeigt haben möchte
+% auch in den evaluierten Anwendungen war das der Fall, Visualisierung im immer im Zentrum und viele Panels ließen sich einklappen
 % 3 Bereiche, Visualisierung, Konfiguration und Informationen
 % Visualiserung im Mittelpunkt, beidenen anderen Bereiche sollen sich bei Bedarf ein- und Ausklappen können
 % FontAwesome 5 für die Icons
 % slider initial eingeklappt damit der User weiß, auf welche Teil des sliders er zum Öffnen und Schließen klicken muss
-
 % Genauigkeit alles angezigten Werte konfigurierbar machen (Anzahl Stellen nach dem Komma)
+% Sprache der Anwendung soll Englisch sein, da es, besonders im akademischen Bereich, die größte Zielgruppe erreicht
+% meisten Interaktionen nicht weiter erklärbar da intuitiv, muss natürlich evaluiert werden, aber schon im vorraus stellt sich die Frage, wie der User dazu bewegt werden kann auf bestimmte Orte zu klicken, um Details über den Ort zu erhalten -> hier könnte man den Mauszeiger anpassen, wenn sich dieser über dem Planeten befindet, ob dies ausreicht ist fragwürdig

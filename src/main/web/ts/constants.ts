@@ -1,3 +1,6 @@
+/**
+ * Defines several constants used by the whole application.
+ */
 export namespace Constants {
     export const CHUNK_SIZE_PIXELS = 2880;
     export const METER_PER_GL_UNIT = 10000;

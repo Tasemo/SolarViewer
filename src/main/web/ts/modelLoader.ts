@@ -4,10 +4,10 @@ import { Projection } from './projections';
 
 export default class ModelLoader {
 
-    private baseUrl: string;
-    private meterPerPixel: number;
-    projection: Projection;
-    radius: number;
+    private readonly baseUrl: string;
+    private readonly meterPerPixel: number;
+    public projection: Projection;
+    public readonly radius: number;
 
     constructor(baseUrl: string, meterPerPixel: number, projection: Projection, radius: number) {
         this.baseUrl = baseUrl;
@@ -17,15 +17,15 @@ export default class ModelLoader {
     }
 
     /**
-     * Loads the elevation data at the specified position with the specified size in pixel space from the server
-     * and constructs a three dimensional indexed grid model.
+     * Loads the elevation data at the specified position with the specified size and stride in pixel space from the server
+     * and constructs a three dimensional indexed grid model with the current projection.
      *
      * @param xPixel the x position in pixel space
      * @param zPixel the z position in pixel space
      * @param width the width in pixel space
      * @param height the height in pixel space
      */
-    async load(xPixel: number, zPixel: number, width: number, height: number, stride: number): Promise<THREE.BufferGeometry> {
+    public async load(xPixel: number, zPixel: number, width: number, height: number, stride: number): Promise<THREE.BufferGeometry> {
         const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${stride}&width=${width}&height=${height}`;
         const elevationData: number[] = await (await fetch(url)).json()
         const vertices = new Float32Array(3 * elevationData.length);
@@ -59,6 +59,13 @@ export default class ModelLoader {
         return geometry;
     }
 
+    /**
+     * Generates a plane fully stretching the dimensions of the chunk with just 4 vertices.
+     * While it is projected using the current projection, the height of the chunk is not taken into account.
+     * 
+     * @param x the x position of the chunk in chunk space
+     * @param z the z position of the chunk in chunk space
+     */
     generatePlane(x: number, z: number): THREE.BufferGeometry {
         const vertices = new Float32Array(12);
         this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 0);
@@ -72,6 +79,12 @@ export default class ModelLoader {
         return geometry;
     }
 
+    /**
+     * Calculates the midpoint of a chunk that was projected in the current projection.
+     * 
+     * @param x the x position of the chunk in chunk space
+     * @param z the z position of the chunk in chunk space
+     */
     getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
         const x = xChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
         const z = zChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;

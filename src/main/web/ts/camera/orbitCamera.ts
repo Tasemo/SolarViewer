@@ -3,11 +3,15 @@ import { Constants } from "../constants";
 import Throttle from '../throttle';
 import CameraController from './cameraController';
 
+/**
+ * A camera controller that allows the camera to pivot around a fixed point at a certain distance by dragging the mouse. The distance
+ * can be adjusted by the mouse wheel as is guaranteed to stay between a configurable distance.
+ */
 export default class OrbitCamera implements CameraController {
 
     private readonly changeEvent = { type: "viewChange" };
 
-    enabled = true;
+    public enabled = true;
     private readonly camera: THREE.Camera;
     private readonly eventThrottle = new Throttle((() => this.camera.dispatchEvent(this.changeEvent)).bind(this), Constants.VIEW_CHANGE_THROTTLE);
     private dragging = false;

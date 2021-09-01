@@ -8,11 +8,11 @@ import OrbitCamera from '../camera/orbitCamera';
 
 export default class ConfigArea extends SliderElement {
 
-    private freeFlyCamera: FreeFlyCamera;
-    private orbitCamera: OrbitCamera;
+    private readonly freeFlyCamera: FreeFlyCamera;
+    private readonly orbitCamera: OrbitCamera;
     private previouslyLocked = true;
-    private cameraInput: HTMLInputElement;
-    current: CameraController;
+    private readonly cameraInput: HTMLInputElement;
+    public current: CameraController;
 
     constructor(worldController: WorldController, uniforms: { [uniform: string]: THREE.IUniform }) {
         super(document.querySelector("#configArea")!)
