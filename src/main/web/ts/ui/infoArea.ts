@@ -18,11 +18,12 @@ function round(number: number, decimals = 0): number {
 
 export default class InfoArea extends SliderElement {
 
-    private rayCaster = new THREE.Raycaster();
-    private worldController: WorldController;
-    private latitude: HTMLElement;
-    private longitude: HTMLElement;
-    private altitude: HTMLElement;
+    private readonly rayCaster = new THREE.Raycaster();
+    private readonly worldController: WorldController;
+    private readonly latitude: HTMLElement;
+    private readonly longitude: HTMLElement;
+    private readonly altitude: HTMLElement;
+    private readonly viewingHeight: HTMLElement;
 
     constructor(worldController: WorldController) {
         super(document.querySelector("#infoArea")!)
@@ -33,7 +34,15 @@ export default class InfoArea extends SliderElement {
         this.latitude = document.querySelector("#latitude")!;
         this.longitude = document.querySelector("#longitude")!;
         this.altitude = document.querySelector("#altitude")!;
+        this.viewingHeight = document.querySelector("#viewingHeight")!;
         window.addEventListener("click", this.raycast.bind(this));
+        worldController.camera.addEventListener("viewChange", this.onViewChange.bind(this));
+        this.onViewChange();
+    }
+
+    private onViewChange() {
+        const height = this.worldController.camera.position.length() * Constants.METER_PER_GL_UNIT - Constants.MOLA_RADIUS_METERS;
+        this.viewingHeight.textContent = round(height / 1000) + "km";
     }
 
     private raycast(event: MouseEvent) {
