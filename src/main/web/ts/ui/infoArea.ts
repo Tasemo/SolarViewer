@@ -12,6 +12,10 @@ function computeColors(steps: number): string {
     return colors.join(",");
 }
 
+function round(number: number, decimals = 0): number {
+    return Number(Math.round(Number(number + "e" + decimals)) + "e-" + decimals);
+}
+
 export default class InfoArea extends SliderElement {
 
     private rayCaster = new THREE.Raycaster();
@@ -45,16 +49,16 @@ export default class InfoArea extends SliderElement {
             const radius = this.worldController.modelLoader.radius;
             const latLongAlt = projection.getLatLongAlt(point, radius);
             if (latLongAlt.x > 0) {
-                this.latitude.textContent = THREE.MathUtils.radToDeg(latLongAlt.x) + "° S";
+                this.latitude.textContent = round(THREE.MathUtils.radToDeg(latLongAlt.x), 1) + "° S";
             } else {
-                this.latitude.textContent = -THREE.MathUtils.radToDeg(latLongAlt.x) + "° N";
+                this.latitude.textContent = -round(THREE.MathUtils.radToDeg(latLongAlt.x), 1) + "° N";
             }
             if (latLongAlt.y > 0) {
-                this.longitude.textContent = THREE.MathUtils.radToDeg(latLongAlt.y) + "° E";
+                this.longitude.textContent = round(THREE.MathUtils.radToDeg(latLongAlt.y), 1) + "° E";
             } else {
-                this.longitude.textContent = -THREE.MathUtils.radToDeg(latLongAlt.y) + "° W";
+                this.longitude.textContent = -round(THREE.MathUtils.radToDeg(latLongAlt.y), 1) + "° W";
             }
-            this.altitude.textContent = latLongAlt.z + "m";
+            this.altitude.textContent = round(latLongAlt.z) + "m";
         }
     }
 }
