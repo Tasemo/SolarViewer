@@ -119,7 +119,8 @@ export default class WorldController {
 
     /**
      * Loads the chunk at the specified position in chunk space with the given stride and requests additional pixels
-     * to connect neighboring chunks.
+     * to connect neighboring chunks. If a chunk already exists at the place and a different stride is requested, the
+     * existing chunk will be deleted.
      * 
      * @param x the x position in chunk space
      * @param z the z position in chunk space
