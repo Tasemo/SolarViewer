@@ -55,6 +55,7 @@ Das Durchführen von verlustfreien Methoden allein reicht nicht aus, um den Spei
 % hier ausnutzen, dass zum Beispiel bei geringen Zoomstufen Unterschiede in den Daten nicht mehr wahrgenommen werden können (physiologie)
 % geringe Änderungen in einem 3D Kontekt, auch oft als geringe räumliche Frequenz beschrieben, entfernen
 % Reduktion der Datenmenge abhängig vom umliegenden Terrain -> ähnliche vertices müssen nicht wiederholt werden,
+% komplexere mesh simplification Verfahren (nenne Beispiele) sind nicht notwendig, da natürliche Daten einfach zu ähnlich sind 
 
 \subsection{Redundanzentfernung}\label{redundanzberechnung}
 Bevor ein geeigneter Algorithmus gefunden werden kann, müssen einige Probleme mit der Entfernung von Redundanzen besprochen werden. Zum einen besteht das Problem, die gefundenen Lücken in einem Datenformat darzustellen. Normalerweise besteht immer der gleiche Abstand zwischen zwei benachbarten Datenpunkte, wenn jetzt einfach Vertices entfernt werden, dann ändern sich die Abstände und dies muss irgendwie kodiert werden. Eine Möglichkeit dies zu umgehen, ist die Entfernung zur Laufzeit durchzuführen und direkt bei der Erstellung redundante Vertices zu erkennen. Da der hier verwendete Algorithmus allerdings sehr kostenaufwendig ist, wurde dieser Ansatz verworfen. Stattdessen werden die Lücken durch vordefinierte Werte kodiert, die nicht in den originalen Daten vorhanden sind. Im konkreten Fall wurde der kleinstmögliche 16bit Wert gewählt.
@@ -105,3 +106,8 @@ Als machbare Alternative wurde hier ein Algorithmus aus der Klasse der greedy Al
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
+
+\subsection{Alternative Verfahren}
+
+% beschreibe hier zum Beispiel, dass Bilder anstelle von 3D Modellen verwendet werden können
+% finde weitere Alternativen (2)
