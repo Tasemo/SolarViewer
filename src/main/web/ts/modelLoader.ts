@@ -66,7 +66,7 @@ export default class ModelLoader {
      * @param x the x position of the chunk in chunk space
      * @param z the z position of the chunk in chunk space
      */
-    generatePlane(x: number, z: number): THREE.BufferGeometry {
+    public generatePlane(x: number, z: number): THREE.BufferGeometry {
         const vertices = new Float32Array(12);
         this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 0);
         this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 3);
@@ -85,7 +85,7 @@ export default class ModelLoader {
      * @param x the x position of the chunk in chunk space
      * @param z the z position of the chunk in chunk space
      */
-    getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
+    public getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
         const x = xChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
         const z = zChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
         return this.projected(new THREE.Vector3(x, 0, z));
