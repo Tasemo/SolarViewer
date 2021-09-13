@@ -33,11 +33,18 @@ public class MolaDataEndpoint implements HttpHandler {
     private static final int PIXELS_HEIGHT = 23040;
     private static final int CHUNK_SIZE = 2880;
 
+    private final String dataPath;
+
     public MolaDataEndpoint() throws IOException {
-        if (!Files.exists(Path.of(MARKED_DATA))) {
-            short[][] data = load(ORIGINAL_DATA, 0, 0, PIXELS_WIDTH, PIXELS_HEIGHT, 1);
+        this(ORIGINAL_DATA, MARKED_DATA, PIXELS_WIDTH, PIXELS_HEIGHT);
+    }
+
+    MolaDataEndpoint(String originalDataPath, String markedDataPath, int width, int height) throws IOException {
+        dataPath = originalDataPath;
+        if (!Files.exists(Path.of(markedDataPath))) {
+            short[][] data = load(originalDataPath, 0, 0, width, height, 1);
             findRedundancies(data, REPLACEMENT, CHUNK_SIZE);
-            write(flatten(data));
+            write(flatten(data), markedDataPath, width, height);
         }
     }
 
@@ -49,11 +56,11 @@ public class MolaDataEndpoint implements HttpHandler {
         int width = Integer.parseInt(params.get("width").getFirst());
         int height = Integer.parseInt(params.get("height").getFirst());
         int stride = params.get("stride") == null ? 1 : Integer.parseInt(params.get("stride").getFirst());
-        short[][] data = load(ORIGINAL_DATA, x, z, width, height, stride);
+        short[][] data = load(dataPath, x, z, width, height, stride);
         exchange.getResponseSender().send(Arrays.toString(flatten(data)));
     }
 
-    private static short[][] load(String filePath, int x, int z, int width, int height, int stride) throws IOException {
+    static short[][] load(String filePath, int x, int z, int width, int height, int stride) throws IOException {
         RandomAccessFile file = new RandomAccessFile(filePath, "r");
         try (ImageInputStream input = ImageIO.createImageInputStream(file)) {
             ImageReader reader = ImageIO.getImageReaders(input).next();
@@ -90,12 +97,12 @@ public class MolaDataEndpoint implements HttpHandler {
         return ((DataBufferShort) buffer).getData();
     }
 
-    private static void write(short[] data) throws IOException {
-        try (ImageOutputStream output = ImageIO.createImageOutputStream(new File(MARKED_DATA))) {
+    static void write(short[] data, String path, int width, int height) throws IOException {
+        try (ImageOutputStream output = ImageIO.createImageOutputStream(new File(path))) {
             ImageWriter writer = ImageIO.getImageWritersBySuffix("tiff").next();
             writer.setOutput(output);
             DataBufferShort buffer = new DataBufferShort(data, data.length);
-            SampleModel sampleModel = new ComponentSampleModel(DataBuffer.TYPE_SHORT, PIXELS_WIDTH, PIXELS_HEIGHT, 1, PIXELS_WIDTH, new int[]{0});
+            SampleModel sampleModel = new ComponentSampleModel(DataBuffer.TYPE_SHORT, width, height, 1, width, new int[]{0});
             WritableRaster raster = Raster.createWritableRaster(sampleModel, buffer, null);
             ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
             ColorModel colorModel = new ComponentColorModel(colorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_SHORT);
