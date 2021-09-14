@@ -78,7 +78,10 @@ public class MolaDataEndpoint implements HttpHandler {
             }
             int zOverflow = height + z - reader.getHeight(0);
             if (zOverflow > 0) {
-                param.setSourceRegion(new Rectangle(x, 0, width, zOverflow));
+                // int xOffset = (x + reader.getWidth(0) / 2) % reader.getWidth(0);
+                // using the xOffset instead of x is technically correct, but then we have to deal with xOverflow again
+                // and there is no visual difference on MOLA data
+                param.setSourceRegion(new Rectangle(x, reader.getHeight(0) - zOverflow, width, zOverflow));
                 short[] additional = getData(reader.read(0, param));
                 data = addRow(data, additional);
             }

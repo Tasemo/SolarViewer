@@ -151,6 +151,9 @@ export default class WorldController {
         if (x === Constants.MOLA_CHUNKS_WIDTH - 1) {
             loadWidth += stride;
         }
+        if (z === Constants.MOLA_CHUNKS_HEIGHT - 1) {
+            loadHeight += stride;
+        }
         const geometry = await this.modelLoader.load(loadX, loadZ, loadWidth, loadHeight, stride);
         const mesh = new THREE.Mesh(geometry, this.material);
         chunk.mesh = mesh;
