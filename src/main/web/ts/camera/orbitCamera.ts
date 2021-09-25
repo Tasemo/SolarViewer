@@ -34,17 +34,19 @@ export default class OrbitCamera implements CameraController {
     update(frameTimeSeconds: number) { }
 
     private onMouseWheel(event: WheelEvent) {
-        let change = Math.sign(event.deltaY) * 2;
-        const current = this.camera.position.z;
-        if (change + current > this.maxDistance) {
-            change = this.maxDistance - current;
-        } else if (change + current < this.minDistance) {
-            change = this.minDistance - current;
-        }
-        if (change !== 0) {
-            this.camera.translateOnAxis(new THREE.Vector3(0, 0, 1), change);
-            this.camera.updateMatrixWorld(true);
-            this.eventThrottle.apply();
+        if (this.enabled) {
+            let change = Math.sign(event.deltaY) * 2;
+            const current = this.camera.position.z;
+            if (change + current > this.maxDistance) {
+                change = this.maxDistance - current;
+            } else if (change + current < this.minDistance) {
+                change = this.minDistance - current;
+            }
+            if (change !== 0) {
+                this.camera.translateOnAxis(new THREE.Vector3(0, 0, 1), change);
+                this.camera.updateMatrixWorld(true);
+                this.eventThrottle.apply();
+            }
         }
     }
 
