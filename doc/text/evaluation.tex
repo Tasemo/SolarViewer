@@ -62,12 +62,12 @@ Dies ist ein nicht hinnehmbarer Zustand, da ab diesem Zeitpunkt ein kritischer P
 
 Dies zeigt, dass der Requests auf Client-Seite sehr lang im Status “Stalled” wartete. Die Zeit, welche mit dem Warten auf die Antwort verbracht wurde, machte dabei nur ein Drittel der Gesamtzeit aus. Eine kurze Recherche zeigte dann, dass die maximale Anzahl an nebenläufigen Requests pro Server im Google Chrome Browser auf sechs limitiert ist. Auch wenn also auf dem Server genügend Ressourcen verfügbar sind, werden diese nicht vollständig ausgeschöpft. Dieses Limit des Browsers lässt sich trotz vielfältiger Feature Requests\footnote{z.B. https://bugs.chromium.org/p/chromium/issues/detail?id=87381} nicht ändern. Als einziger Optimierungspunkt bleibt also die Reduzierung der Laufzeit einzelner Requests auf Serverseite, was nicht trivial umsetzbar ist. Auch könnte man überlegen das HTTP/2 Server Push Feature zu nutzen, mit dem ein Server auf einen Request mit mehr als nur einer Response antworten kann. Somit könnte die Limitierung der Anzahl der Requests umgangen werden. Es ist jedoch unklar, wie aufwändig eine dementsprechende Änderung auf Client- und Serverseite ist.
 
-Auch der Speicherverbrauch im RAM ist deutlich unter den Erwartungen und den Anforderungen. Der Graph zeigt den Speicherplatz im JavaScript Heap über die Zeit an. Die Werte schwanken dabei zwischen 1.1 MB und 9.5 MB.
+Auch der Speicherverbrauch im RAM ist deutlich unter den Erwartungen und den Anforderungen (siehe Abbildung \ref{heapSize}). Der Graph zeigt den Speicherplatz im JavaScript Heap über die Zeit an. Die Werte schwanken dabei zwischen 1.1 MB und 9.5 MB.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{heapSize.png}
   \caption{Speicherverbrauch im JavaScript Heap über Zeit}
-  \label{specificRequest}
+  \label{heapSize}
 \end{figure}
 
 Der gesamte RAM und VRAM wurde auch in den Abbildung \ref{memoryAvg} und \ref{memoryMax} mit dem Tool gpu-z ermittelt. Da dies natürlich systemweite Werte darstellt, kann nur mit der Differenz zum Startzeitpunkt gearbeitet werden, um damit einen ungefähren Wert zu erhalten. Dieser Wert ist natürlich auch durch die Benutzung des Browsers an sich verfälscht. Zu Beginn des Tests war der VRAM mit 840 MB und der RAM mit 7740 MB gefüllt. Der Memory Controller Load kann als Indiz genutzt werden, mit welchem Durchsatz Daten auf die GPU geschafft werden können. Seine Auslastung lag zu Anfang bei 2\%. Die GPU Auslastung wurde hier auch nochmal betrachtet, da vorige Tests nur die totale Zeit auf der GPU betrachtet hatten, was nichts darüber aussagt, wie stark sie zu bestimmten Zeiten beansprucht wurde. Da eine GPU eine geteilte Ressource ist, sollte man hierbei auch an andere Anwendungen denken. Sie lag zu Beginn des Tests bei ungefähr 5\%.
