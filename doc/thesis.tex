@@ -28,7 +28,10 @@
 \input{text/kurzbeschreibung}
 \tableofcontents
 \listoffigures
+\let\defaultclearpage\clearpage
+\let\clearpage\relax
 \listofalgorithms
+\let\clearpage\defaultclearpage
 \mainmatter
 \input{text/einfuehrung}
 \input{text/grundlagen}
