@@ -34,7 +34,7 @@ export default class OrbitCamera implements CameraController {
     update(frameTimeSeconds: number) { }
 
     private onMouseWheel(event: WheelEvent) {
-        let change = Math.sign(event.deltaY) * 2;
+        let change = Math.sign(event.deltaY) * Constants.SCROLL_SPEED;
         const current = this.camera.position.z;
         if (change + current > this.maxDistance) {
             change = this.maxDistance - current;
@@ -50,8 +50,8 @@ export default class OrbitCamera implements CameraController {
 
     private onMouseMove(event: MouseEvent) {
         if (this.enabled && this.dragging) {
-            this.pivot.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), event.movementX * Constants.ROTATION_SPEED);
-            this.pivot.rotateOnAxis(new THREE.Vector3(1, 0, 0), event.movementY * Constants.ROTATION_SPEED);
+            this.pivot.rotateOnWorldAxis(new THREE.Vector3(0, -1, 0), event.movementX * Constants.ROTATION_SPEED);
+            this.pivot.rotateOnAxis(new THREE.Vector3(-1, 0, 0), event.movementY * Constants.ROTATION_SPEED);
             this.pivot.updateMatrixWorld(true);
             this.eventThrottle.apply();
         }

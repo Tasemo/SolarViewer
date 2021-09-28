@@ -41,7 +41,7 @@ public class MolaDataEndpoint implements HttpHandler {
 
     MolaDataEndpoint(String originalDataPath, String markedDataPath, int width, int height) throws IOException {
         dataPath = originalDataPath;
-        if (!Files.exists(Path.of(markedDataPath))) {
+        if (dataPath.equals(markedDataPath) && !Files.exists(Path.of(markedDataPath))) {
             short[][] data = load(originalDataPath, 0, 0, width, height, 1);
             findRedundancies(data, REPLACEMENT, CHUNK_SIZE);
             write(flatten(data), markedDataPath, width, height);

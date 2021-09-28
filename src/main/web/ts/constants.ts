@@ -15,6 +15,7 @@ export namespace Constants {
     export const MOLA_RADIUS_GL_UNITS = MOLA_RADIUS_METERS / METER_PER_GL_UNIT;
     export const MOVEMENT_SPEED = 100;
     export const ROTATION_SPEED = 0.002;
+    export const SCROLL_SPEED = 4;
     export const SLIDER_SPEED = 2000;
     export const HUE_CUTOFF = 0.7;
     export const VIEW_CHANGE_THROTTLE = 1000;
