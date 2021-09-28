@@ -6,17 +6,19 @@
 \usepackage{subcaption}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
+\usepackage{wrapfig}
 \usepackage{float}
 \usepackage{xcolor}
 \usepackage[ngerman]{babel}
 \usepackage{csquotes}
 \usepackage[parfill]{parskip}
-\usepackage[backend=bibtex, style=numeric]{biblatex}
+\usepackage[backend=bibtex, style=numeric, sorting=none]{biblatex}
 \addbibresource{thesis.bib}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \renewcommand{\listalgorithmname}{Liste der Algorithmen}
 \floatname{algorithm}{Algorithmus}
+\captionsetup{format=plain, font=small}
 \raggedright
 
 \begin{document}
@@ -26,7 +28,10 @@
 \input{text/kurzbeschreibung}
 \tableofcontents
 \listoffigures
+\let\defaultclearpage\clearpage
+\let\clearpage\relax
 \listofalgorithms
+\let\clearpage\defaultclearpage
 \mainmatter
 \input{text/einfuehrung}
 \input{text/grundlagen}
