@@ -4,16 +4,12 @@ import { Projection } from './projections';
 
 export default class ModelLoader {
 
-    private readonly baseUrl: string;
-    private readonly meterPerPixel: number;
+    public constants: Constants;
     public projection: Projection;
-    public readonly radius: number;
 
-    constructor(baseUrl: string, meterPerPixel: number, projection: Projection, radius: number) {
-        this.baseUrl = baseUrl;
-        this.meterPerPixel = meterPerPixel;
+    constructor(constants: Constants, projection: Projection) {
+        this.constants = constants;
         this.projection = projection;
-        this.radius = radius;
     }
 
     /**
@@ -26,14 +22,14 @@ export default class ModelLoader {
      * @param height the height in pixel space
      */
     public async load(xPixel: number, zPixel: number, width: number, height: number, stride: number): Promise<THREE.BufferGeometry> {
-        const url = `${this.baseUrl}?x=${xPixel}&z=${zPixel}&stride=${stride}&width=${width}&height=${height}`;
+        const url = `${this.constants.url}?x=${xPixel}&z=${zPixel}&stride=${stride}&width=${width}&height=${height}`;
         const elevationData: number[] = await (await fetch(url)).json()
         const vertices = new Float32Array(3 * elevationData.length);
         const dataWidth = width / stride;
         const dataHeight = height / stride;
         for (let i = 0; i < elevationData.length; i++) {
-            const x = ((i % dataWidth) * stride + xPixel) * this.meterPerPixel;
-            const z = (Math.floor(i / dataWidth) * stride + zPixel) * this.meterPerPixel;
+            const x = ((i % dataWidth) * stride + xPixel) * this.constants.meterPerPixel;
+            const z = (Math.floor(i / dataWidth) * stride + zPixel) * this.constants.meterPerPixel;
             this.projected(new THREE.Vector3(x, elevationData[i], z), vertices, i * 3);
         }
         const indexLength = 6 * (dataWidth - 1) * (dataHeight - 1);
@@ -68,10 +64,10 @@ export default class ModelLoader {
      */
     public generatePlane(x: number, z: number): THREE.BufferGeometry {
         const vertices = new Float32Array(12);
-        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 0);
-        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK), vertices, 3);
-        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK), vertices, 6);
-        this.projected(new THREE.Vector3(x * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK, 0, z * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK), vertices, 9);
+        this.projected(new THREE.Vector3(x * this.constants.meterPerChunk, 0, z * this.constants.meterPerChunk), vertices, 0);
+        this.projected(new THREE.Vector3(x * this.constants.meterPerChunk + this.constants.meterPerChunk, 0, z * this.constants.meterPerChunk), vertices, 3);
+        this.projected(new THREE.Vector3(x * this.constants.meterPerChunk, 0, z * this.constants.meterPerChunk + this.constants.meterPerChunk), vertices, 6);
+        this.projected(new THREE.Vector3(x * this.constants.meterPerChunk + this.constants.meterPerChunk, 0, z * this.constants.meterPerChunk + this.constants.meterPerChunk), vertices, 9);
         const indices = new Uint16Array([0, 2, 1, 1, 2, 3]);
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
@@ -86,13 +82,13 @@ export default class ModelLoader {
      * @param z the z position of the chunk in chunk space
      */
     public getMidPoint(xChunk: number, zChunk: number): THREE.Vector3 {
-        const x = xChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
-        const z = zChunk * Constants.MOLA_METER_PER_CHUNK + Constants.MOLA_METER_PER_CHUNK / 2;
+        const x = xChunk * this.constants.meterPerChunk + this.constants.meterPerChunk / 2;
+        const z = zChunk * this.constants.meterPerChunk + this.constants.meterPerChunk / 2;
         return this.projected(new THREE.Vector3(x, 0, z));
     }
 
     private projected(vertex: THREE.Vector3, vertices?: Float32Array, index?: number): THREE.Vector3 {
-        const projected = this.projection.project(vertex, this.radius).divideScalar(Constants.METER_PER_GL_UNIT);
+        const projected = this.projection.project(vertex, this.constants.radiusMeters).divideScalar(Constants.METER_PER_GL_UNIT);
         if (vertices) {
             vertices[index!] = projected.x;
             vertices[index! + 1] = projected.y;

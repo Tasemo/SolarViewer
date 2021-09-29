@@ -1,4 +1,4 @@
-package de.oelkers.solarviewer;
+package de.oelkers.solarviewer.dataEndpoints;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -21,25 +21,17 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.Map;
 
-import static de.oelkers.solarviewer.ArrayUtils.*;
-import static de.oelkers.solarviewer.MolaDataRedundancy.findRedundancies;
+import static de.oelkers.solarviewer.utils.ArrayUtils.*;
+import static de.oelkers.solarviewer.utils.RasterDataRedundancy.findRedundancies;
 
-public class MolaDataEndpoint implements HttpHandler {
+public abstract class RasterDataEndpoint implements HttpHandler {
 
-    private static final String ORIGINAL_DATA = "data/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif";
-    private static final String MARKED_DATA = "data/Mars_MGS_MOLA_DEM_mosaic_global_marked_463m.tif";
     private static final short REPLACEMENT = Short.MIN_VALUE;
-    private static final int PIXELS_WIDTH = 46080;
-    private static final int PIXELS_HEIGHT = 23040;
     private static final int CHUNK_SIZE = 2880;
 
     private final String dataPath;
 
-    public MolaDataEndpoint() throws IOException {
-        this(ORIGINAL_DATA, MARKED_DATA, PIXELS_WIDTH, PIXELS_HEIGHT);
-    }
-
-    MolaDataEndpoint(String originalDataPath, String markedDataPath, int width, int height) throws IOException {
+    protected RasterDataEndpoint(String originalDataPath, String markedDataPath, int width, int height) throws IOException {
         dataPath = originalDataPath;
         if (dataPath.equals(markedDataPath) && !Files.exists(Path.of(markedDataPath))) {
             short[][] data = load(originalDataPath, 0, 0, width, height, 1);
@@ -65,7 +57,7 @@ public class MolaDataEndpoint implements HttpHandler {
         try (ImageInputStream input = ImageIO.createImageInputStream(file)) {
             ImageReader reader = ImageIO.getImageReaders(input).next();
             ImageReadParam param = reader.getDefaultReadParam();
-            param.setSourceSubsampling(stride, stride, 0, 0);
+            param.setSourceSubsampling(stride, stride,0, 0);
             param.setSourceRegion(new Rectangle(x, z, width, height));
             reader.setInput(input, true, true);
             Raster raster = reader.read(0, param).getData();
@@ -80,7 +72,6 @@ public class MolaDataEndpoint implements HttpHandler {
             if (zOverflow > 0) {
                 // int xOffset = (x + reader.getWidth(0) / 2) % reader.getWidth(0);
                 // using the xOffset instead of x is technically correct, but then we have to deal with xOverflow again
-                // and there is no visual difference on MOLA data
                 param.setSourceRegion(new Rectangle(x, reader.getHeight(0) - zOverflow, width, zOverflow));
                 short[] additional = getData(reader.read(0, param));
                 data = addRow(data, additional);

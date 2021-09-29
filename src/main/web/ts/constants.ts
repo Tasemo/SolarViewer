@@ -1,22 +1,75 @@
 /**
  * Defines several constants used by the whole application.
  */
-export namespace Constants {
-    export const CHUNK_SIZE_PIXELS = 2880;
-    export const METER_PER_GL_UNIT = 10000;
-    export const MOLA_METER_PER_PIXEL = 463.0835744;
-    export const MOLA_PIXELS_PER_GL_UNIT = 1 / MOLA_METER_PER_PIXEL / METER_PER_GL_UNIT;
-    export const MOLA_PIXELS_WIDTH = 46080;
-    export const MOLA_PIXELS_HEIGHT = 23040;
-    export const MOLA_RADIUS_METERS = 3396190;
-    export const MOLA_CHUNKS_WIDTH = MOLA_PIXELS_WIDTH / CHUNK_SIZE_PIXELS;
-    export const MOLA_CHUNKS_HEIGHT = MOLA_PIXELS_HEIGHT / CHUNK_SIZE_PIXELS;
-    export const MOLA_METER_PER_CHUNK = CHUNK_SIZE_PIXELS * MOLA_METER_PER_PIXEL;
-    export const MOLA_RADIUS_GL_UNITS = MOLA_RADIUS_METERS / METER_PER_GL_UNIT;
-    export const MOVEMENT_SPEED = 100;
-    export const ROTATION_SPEED = 0.002;
-    export const SCROLL_SPEED = 4;
-    export const SLIDER_SPEED = 2000;
-    export const HUE_CUTOFF = 0.7;
-    export const VIEW_CHANGE_THROTTLE = 1000;
+export abstract class Constants {
+
+    public readonly url: string;
+    public readonly meterPerPixel: number;
+    public readonly pixelsWidth: number;
+    public readonly pixelsHeight: number;
+    public readonly radiusMeters: number;
+
+    constructor(url:string, meterPerPixel: number, pixelsWidth: number, pixelsHeight: number, radiusMeters: number) {
+        this.url = url;
+        this.meterPerPixel = meterPerPixel;
+        this.pixelsWidth = pixelsWidth;
+        this.pixelsHeight = pixelsHeight;
+        this.radiusMeters = radiusMeters;
+    }
+
+    static readonly CHUNK_SIZE_PIXELS = 2880;
+    static readonly METER_PER_GL_UNIT = 10000;
+    static readonly MOVEMENT_SPEED = 100;
+    static readonly ROTATION_SPEED = 0.002;
+    static readonly SCROLL_SPEED = 4;
+    static readonly SLIDER_SPEED = 2000;
+    static readonly HUE_CUTOFF = 0.7;
+    static readonly VIEW_CHANGE_THROTTLE = 1000;
+    
+    public get pixelsPerGlUnit(): number {
+        return 1 / this.meterPerPixel / Constants.METER_PER_GL_UNIT;
+    }
+
+    public get chunkWidth(): number {
+        return this.pixelsWidth / Constants.CHUNK_SIZE_PIXELS;
+    }
+
+    public get chunkHeight(): number {
+        return this.pixelsHeight / Constants.CHUNK_SIZE_PIXELS;
+    }
+
+    public get meterPerChunk(): number {
+        return Constants.CHUNK_SIZE_PIXELS * this.meterPerPixel;
+    }
+
+    public get radiusGlUnits(): number {
+        return this.radiusMeters / Constants.METER_PER_GL_UNIT;
+    }
+}
+
+export class MolaConstants extends Constants {
+
+    public static readonly INSTANCE = new MolaConstants();
+
+    private constructor() {
+        super("mola", 463.0835744, 46080, 23040, 3396190)
+    }
+}
+
+export class LolaConstants extends Constants {
+
+    public static readonly INSTANCE = new LolaConstants();
+
+    private constructor() {
+        super("lola", 118.4505876, 92160, 46080, 1737400)
+    }
+}
+
+export class MessengerConstants extends Constants {
+
+    public static readonly INSTANCE = new MessengerConstants();
+
+    private constructor() {
+        super("messenger", 665.24315270546, 23040, 11520, 2439400)
+    }
 }

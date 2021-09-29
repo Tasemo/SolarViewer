@@ -1,10 +1,11 @@
+import * as THREE from 'three';
 import SliderElement from './sliderElement';
 import WorldController from '../worldController';
-import { Projections } from '../projections';
-import * as THREE from 'three';
+import { FlatProjection, SphericalProjection } from '../projections';
 import CameraController from '../camera/cameraController';
 import FreeFlyCamera from '../camera/freeFlyCamera';
 import OrbitCamera from '../camera/orbitCamera';
+import { LolaConstants, MessengerConstants, MolaConstants } from '../constants';
 
 export default class ConfigArea extends SliderElement {
 
@@ -12,24 +13,26 @@ export default class ConfigArea extends SliderElement {
     private readonly orbitCamera: OrbitCamera;
     private previouslyLocked = true;
     private readonly cameraInput: HTMLInputElement;
-    public current: CameraController;
+    public currentCamera: CameraController;
+    private currentPlanet = "mars";
 
     constructor(worldController: WorldController, uniforms: { [uniform: string]: THREE.IUniform }) {
         super(document.querySelector("#configArea")!)
         this.freeFlyCamera = new FreeFlyCamera(worldController.camera);
         this.orbitCamera = new OrbitCamera(worldController.camera, new THREE.Vector3());
-        this.current = this.orbitCamera;
+        this.currentCamera = this.orbitCamera;
         this.freeFlyCamera.enabled = false;
         this.cameraInput = document.querySelector("#lockedCamera")!;
         this.configureProjectionInput(worldController, uniforms);
         this.configureScaleInput(uniforms);
         this.configureCameraInput();
+        this.configurePlanetInput(worldController, uniforms);
     }
 
     private configureProjectionInput(worldController: WorldController, uniforms: { [uniform: string]: THREE.IUniform }) {
         const projection: HTMLInputElement = document.querySelector("#projection")!;
         projection.addEventListener("change", (() => {
-            const value = projection.checked ? Projections.SPHERICAL : Projections.FLAT;
+            const value = projection.checked ? SphericalProjection.INSTANCE : FlatProjection.INSTANCE;
             worldController.modelLoader.projection = value;
             if (projection.checked) {
                 this.cameraInput.checked = this.previouslyLocked;
@@ -83,6 +86,28 @@ export default class ConfigArea extends SliderElement {
         }).bind(this))
     }
 
+    private async configurePlanetInput(worldController: WorldController, uniforms: { [uniform: string]: THREE.IUniform }) {        
+        const planetInput: HTMLSelectElement = document.querySelector("#planet")!;
+        const avilailableData = (await (await fetch("available")).text()).split(",");
+        for (let i = 0; i < avilailableData.length; i++) {
+            planetInput.options[i] = new Option(avilailableData[i], avilailableData[i]);
+        }
+        planetInput.addEventListener("change", (() => {
+            if (planetInput.value !== this.currentPlanet) {
+                if (planetInput.value === "Mars") {
+                    worldController.modelLoader.constants = MolaConstants.INSTANCE;
+                } else if (planetInput.value === "Moon") {
+                    worldController.modelLoader.constants = LolaConstants.INSTANCE;
+                } else if (planetInput.value === "Mercury") {
+                    worldController.modelLoader.constants = MessengerConstants.INSTANCE;
+                }
+                this.currentPlanet = planetInput.value;
+                uniforms["radius"]!.value =  worldController.modelLoader.constants.radiusMeters;
+                worldController.reload();
+            }
+        }).bind(this));
+    }
+
     private configureCameraInput() {
         this.cameraInput.addEventListener("change", (() => {
             this.setCurrent(this.cameraInput.checked ? this.orbitCamera : this.freeFlyCamera);
@@ -90,8 +115,8 @@ export default class ConfigArea extends SliderElement {
     }
 
     private setCurrent(camera: CameraController) {
-        this.current.enabled = false;
-        this.current = camera;
-        this.current.enabled = true;
+        this.currentCamera.enabled = false;
+        this.currentCamera = camera;
+        this.currentCamera.enabled = true;
     }
 }

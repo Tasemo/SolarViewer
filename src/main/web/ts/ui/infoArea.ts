@@ -41,7 +41,7 @@ export default class InfoArea extends SliderElement {
     }
 
     private onViewChange() {
-        const height = this.worldController.camera.position.length() * Constants.METER_PER_GL_UNIT - Constants.MOLA_RADIUS_METERS;
+        const height = this.worldController.camera.position.length() * Constants.METER_PER_GL_UNIT - this.worldController.modelLoader.constants.radiusMeters;
         this.viewingHeight.textContent = round(height / 1000) + "km";
     }
 
@@ -55,7 +55,7 @@ export default class InfoArea extends SliderElement {
         if (intersections.length > 0) {
             const point = intersections[0]!.point.multiplyScalar(Constants.METER_PER_GL_UNIT);
             const projection = this.worldController.modelLoader.projection;
-            const radius = this.worldController.modelLoader.radius;
+            const radius = this.worldController.modelLoader.constants.radiusMeters;
             const latLongAlt = projection.getLatLongAlt(point, radius);
             if (latLongAlt.x > 0) {
                 this.latitude.textContent = round(THREE.MathUtils.radToDeg(latLongAlt.x), 1) + "° S";

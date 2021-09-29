@@ -1,13 +1,13 @@
-package de.oelkers.solarviewer;
+package de.oelkers.solarviewer.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class MolaDataRedundancy {
+public final class RasterDataRedundancy {
 
     private static final short MIN_KERNEL_SIZE = 3;
 
-    private MolaDataRedundancy() {}
+    private RasterDataRedundancy() {}
 
     public static void findRedundancies(short[][] data, short replacement) {
         findRedundancies(data, replacement, Integer.MAX_VALUE);

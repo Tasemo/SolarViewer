@@ -1,11 +1,11 @@
-package de.oelkers.solarviewer;
+package de.oelkers.solarviewer.utils;
 
 import org.junit.jupiter.api.Test;
 
-import static de.oelkers.solarviewer.MolaDataRedundancy.findRedundancies;
+import static de.oelkers.solarviewer.utils.RasterDataRedundancy.findRedundancies;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-class MolaDataRedundancyUnitTest {
+class RasterDataRedundancyUnitTest {
 
     @Test
     public void testFindRedundanciesFlatGrid() {

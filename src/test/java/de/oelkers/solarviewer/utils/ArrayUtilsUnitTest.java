@@ -1,8 +1,8 @@
-package de.oelkers.solarviewer;
+package de.oelkers.solarviewer.utils;
 
 import org.junit.jupiter.api.Test;
 
-import static de.oelkers.solarviewer.ArrayUtils.*;
+import static de.oelkers.solarviewer.utils.ArrayUtils.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class ArrayUtilsUnitTest {

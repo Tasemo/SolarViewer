@@ -1,4 +1,4 @@
-package de.oelkers.solarviewer;
+package de.oelkers.solarviewer.utils;
 
 import java.util.Arrays;
 

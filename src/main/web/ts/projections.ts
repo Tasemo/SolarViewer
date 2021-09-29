@@ -1,9 +1,29 @@
 import * as THREE from 'three';
 
-class SphericalProjection implements Projection {
+export interface Projection {
+
+    project(vertex: THREE.Vector3, radius: number): THREE.Vector3
+    unproject(vertex: THREE.Vector3, radius: number): THREE.Vector3
+
+    /**
+     * Gets latitude, longitude and altitude from the given projected vertex. The units
+     * of vertex and radius have to match (e.g meters or GL units). The radial unit is radians and 
+     * the altitude is in the unit the provided data is in.
+     * 
+     * @param vertex the projected vertex
+     * @param radius the radius of the sphere
+     */
+    getLatLongAlt(vertex: THREE.Vector3, radius: number): THREE.Vector3
+}
+
+export class SphericalProjection implements Projection {
+
+    public static readonly INSTANCE = new SphericalProjection();
+
+    private constructor() {}
 
     public project(vertex: THREE.Vector3, radius: number): THREE.Vector3 {
-        const latLongAlt = Projections.FLAT.getLatLongAlt(vertex, radius);
+        const latLongAlt = FlatProjection.INSTANCE.getLatLongAlt(vertex, radius);
         return this.toSphereVertex(latLongAlt.x, latLongAlt.y, radius + latLongAlt.z);
     }
 
@@ -35,7 +55,11 @@ class SphericalProjection implements Projection {
     }
 }
 
-class FlatProjection implements Projection {
+export class FlatProjection implements Projection {
+
+    public static readonly INSTANCE = new FlatProjection();
+
+    private constructor() {}
 
     public project(vertex: THREE.Vector3, _: number) {
         return vertex;
@@ -50,29 +74,4 @@ class FlatProjection implements Projection {
         const longitude = vertex.x / radius - Math.PI;
         return new THREE.Vector3(latitude, longitude, vertex.y);
     }
-}
-
-export interface Projection {
-
-    project(vertex: THREE.Vector3, radius: number): THREE.Vector3
-    unproject(vertex: THREE.Vector3, radius: number): THREE.Vector3
-
-    /**
-     * Gets latitude, longitude and altitude from the given projected vertex. The units
-     * of vertex and radius have to match (e.g meters or GL units). The radial unit is radians and 
-     * the altitude is in the unit the provided data is in.
-     * 
-     * @param vertex the projected vertex
-     * @param radius the radius of the sphere
-     */
-    getLatLongAlt(vertex: THREE.Vector3, radius: number): THREE.Vector3
-}
-
-/**
- * Contains a list of singletons of typical projections.
- */
-export namespace Projections {
-
-    export const SPHERICAL: Projection = new SphericalProjection();
-    export const FLAT: Projection = new FlatProjection();
 }
